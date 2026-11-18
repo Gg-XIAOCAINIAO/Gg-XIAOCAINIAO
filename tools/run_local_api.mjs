@@ -5,7 +5,7 @@ import { pathToFileURL } from "node:url";
 import { createD1 } from "./d1-shim.mjs";
 import { handle } from "../functions/_app.js";
 
-export function startApi({ port = 0, dbPath }) {
+export function startApi({ port = 0, dbPath, env = {} }) {
   const DB = createD1(dbPath);
   const server = http.createServer(async (req, res) => {
     try {
@@ -24,7 +24,7 @@ export function startApi({ port = 0, dbPath }) {
       if (req.method !== "GET" && req.method !== "HEAD" && body.length > 0) {
         init.body = body;
       }
-      const response = await handle(new Request(url, init), { DB });
+      const response = await handle(new Request(url, init), { DB, ...env });
       res.statusCode = response.status;
       for (const [key, value] of response.headers.entries()) {
         res.setHeader(key, value);
@@ -53,7 +53,11 @@ async function main() {
     console.error("usage: node tools/run_local_api.mjs --port 8787 --db .tmp/api.db");
     process.exit(1);
   }
-  const { port: actual } = await startApi({ port, dbPath });
+  const env = {};
+  for (const key of ["APP_SECRET", "ADMIN_PASSWORD", "ADMIN_USERNAME", "ADMIN_DISPLAY_NAME", "PASSWORD_ITERATIONS"]) {
+    if (process.env[key]) env[key] = process.env[key];
+  }
+  const { port: actual } = await startApi({ port, dbPath, env });
   console.log(`local api listening on http://127.0.0.1:${actual} (db: ${dbPath})`);
 }
 

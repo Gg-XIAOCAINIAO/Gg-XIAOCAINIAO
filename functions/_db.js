@@ -1,5 +1,6 @@
-// D1 初始化：建表 + 一次性写入演示数据（幂等，可安全重复执行）。
+// D1 初始化：建表 + 一次性写入演示数据 + 结构迁移 + 首个管理员账号（幂等）。
 import { SCHEMA_SQL, SEED_SQL } from "./_seed.js";
+import { hashPassword, passwordIterations } from "./_auth.js";
 
 let initPromises = new WeakMap();
 
@@ -23,11 +24,55 @@ async function initDatabase(env) {
     throw new Error("D1 binding DB is missing");
   }
   await execScript(env.DB, SCHEMA_SQL);
+  await migrateColumns(env.DB);
   const row = await env.DB.prepare("SELECT COUNT(*) AS c FROM categories").first();
   const count = row ? Number(row.c) : 0;
   if (count === 0) {
     await execScript(env.DB, SEED_SQL);
   }
+  await bootstrapAdmin(env);
+}
+
+/** 老库补列：rental_history 的经手人字段（新库已在 SCHEMA_SQL 中创建）。 */
+async function migrateColumns(db) {
+  const columns = await tableColumns(db, "rental_history");
+  if (!columns.has("lend_operator")) {
+    await db.exec("ALTER TABLE rental_history ADD COLUMN lend_operator TEXT");
+  }
+  if (!columns.has("return_operator")) {
+    await db.exec("ALTER TABLE rental_history ADD COLUMN return_operator TEXT");
+  }
+}
+
+async function tableColumns(db, table) {
+  try {
+    const result = await db.prepare(`PRAGMA table_info(${table})`).all();
+    const rows = result && result.results ? result.results : [];
+    return new Set(rows.map((row) => row.name));
+  } catch {
+    return new Set();
+  }
+}
+
+/** 首次部署时用环境变量里的初始管理员密码创建 admin 账号。 */
+async function bootstrapAdmin(env) {
+  const secret = env.APP_SECRET;
+  if (!secret) return;
+  const countRow = await env.DB.prepare("SELECT COUNT(*) AS c FROM users").first();
+  if (countRow && Number(countRow.c) > 0) return;
+  const password = env.ADMIN_PASSWORD;
+  if (!password) return;
+  const username = String(env.ADMIN_USERNAME || "admin").trim() || "admin";
+  const displayName = String(env.ADMIN_DISPLAY_NAME || "管理员").trim() || "管理员";
+  const passwordHash = await hashPassword(password, secret, passwordIterations(env));
+  await env.DB
+    .prepare(
+      `INSERT OR IGNORE INTO users
+         (username, display_name, password_hash, role, active, pwd_ver, created_at)
+       VALUES (?, ?, ?, 'admin', 1, 0, ?)`,
+    )
+    .bind(username, displayName, passwordHash, shanghaiDateTime())
+    .run();
 }
 
 /** 把多语句 SQL 拆成单条并分批执行（D1 的 batch 是原子的，避免超长语句列表）。 */
@@ -55,6 +100,8 @@ export function shanghaiDate(now = new Date()) {
 }
 
 export function shanghaiDateTime(now = new Date()) {
-  const shifted = new Date(now.getTime() + 8 * 60 * 60 * 1000);
-  return shifted.toISOString().slice(0, 19).replace("T", " ");
+  return new Date(now.getTime() + 8 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
 }

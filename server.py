@@ -236,6 +236,13 @@ def migrate_schema(conn: sqlite3.Connection) -> None:
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id, status)"
     )
+    history_columns = {
+        row["name"] for row in conn.execute("PRAGMA table_info(rental_history)")
+    }
+    if "lend_operator" not in history_columns:
+        conn.execute("ALTER TABLE rental_history ADD COLUMN lend_operator TEXT")
+    if "return_operator" not in history_columns:
+        conn.execute("ALTER TABLE rental_history ADD COLUMN return_operator TEXT")
 
 
 def backfill_legacy_categories(conn: sqlite3.Connection) -> None:
@@ -474,6 +481,7 @@ def to_product(row: sqlite3.Row) -> dict:
 
 
 def to_rental(row: sqlite3.Row) -> dict:
+    keys = row.keys()
     return {
         "id": row["id"],
         "product_id": row["product_id"],
@@ -483,6 +491,8 @@ def to_rental(row: sqlite3.Row) -> dict:
         "lend_date": row["lend_date"],
         "return_date": row["return_date"],
         "status": row["status"],
+        "lend_operator": row["lend_operator"] if "lend_operator" in keys else None,
+        "return_operator": row["return_operator"] if "return_operator" in keys else None,
     }
 
 
@@ -720,7 +730,7 @@ def list_history(
     rows = conn.execute(
         f"""
         SELECT id, product_id, product_name, category, borrower,
-               lend_date, return_date, status
+               lend_date, return_date, status, lend_operator, return_operator
           FROM rental_history
           {where}
          ORDER BY lend_date DESC, id DESC
@@ -1518,6 +1528,21 @@ class Handler(BaseHTTPRequestHandler):
 
         if path == "/api/health":
             self.send_json(200, {"ok": True, "brand": "回声科技"})
+            return
+
+        if path == "/api/me":
+            # 本地 Python 版本不启用登录鉴权，前端按管理员展示管理入口。
+            self.send_json(
+                200,
+                {
+                    "user": {
+                        "id": 0,
+                        "username": "local",
+                        "display_name": "本地开发",
+                        "role": "admin",
+                    }
+                },
+            )
             return
 
         if path == "/api/products":

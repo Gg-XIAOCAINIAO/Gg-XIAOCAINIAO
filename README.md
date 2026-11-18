@@ -286,7 +286,49 @@ python tests/test_api.py
 - 构建输出目录：`public`
 - D1 绑定：变量名 `DB`、数据库名 `echo-rental`，见 `wrangler.toml`
 
-> 安全提示：当前线上版没有登录校验，拿到网址的人都可以修改数据；建议只在公司内部传播，后续可加简单口令或 Cloudflare Access。
+> 安全提示：线上版已加登录校验（见下节）。账号由管理员创建，没有自助注册；网址仍建议只在公司内部传播。
+
+## 登录与账号（线上版）
+
+线上版使用 D1 里的 `users` 表做账号体系，所有页面和接口都经过 `functions/_middleware.js` 鉴权。
+
+### 需要的 Cloudflare Secret（Production 环境）
+
+在 Cloudflare 面板 → Workers 和 Pages → `gg-xiaocainiao` → Settings → Variables and Secrets 添加：
+
+| 变量 | 说明 |
+| --- | --- |
+| `APP_SECRET` | 一串随机值，用于会话 Cookie 签名和密码 pepper；**设置后不要更换**，否则所有账号密码失效 |
+| `ADMIN_PASSWORD` | 首次部署时用于自动创建 `admin` 账号的初始密码（至少 8 位） |
+| `ADMIN_USERNAME` | 可选，初始管理员用户名，默认 `admin` |
+| `PASSWORD_ITERATIONS` | 可选，PBKDF2 迭代次数，默认 5000（Cloudflare Workers 硬上限 100000） |
+
+> Secret 只对新部署生效：添加后需要重新部署（重新推送或点「重试部署」）。
+
+### 角色
+
+| 能力 | 成员（member） | 管理员（admin） |
+| --- | --- | --- |
+| 查看产品 / 借用人 / 历史 / 模型 | ✅ | ✅ |
+| 添加借用人、借出、归还 | ✅ | ✅ |
+| 改品类 / 产品 / 模型库、补录或删除历史、删除借用人 | ❌ | ✅ |
+| 账号管理（`/admin/users`） | ❌ | ✅ |
+
+### 使用流程
+
+1. 首次部署后用 `admin` + `ADMIN_PASSWORD` 登录；
+2. 打开 `/account` 修改初始密码（改完旧会话全部失效）；
+3. 打开管理抽屉 →「账号管理」→ 添加员工账号（成员/管理员）；
+4. 员工用分配的账号登录；忘记密码由管理员在账号管理页重置；
+5. 右上角用户区可进入「账号设置」或退出登录。
+
+### 安全细节
+
+- 会话 Cookie：`HttpOnly; Secure; SameSite=Lax`，7 天有效；改密码或停用账号后旧会话立即失效；
+- 密码：PBKDF2-SHA256 + 每用户随机盐 + `APP_SECRET` pepper，数据库里不存明文；
+- 登录失败 5 次锁定 1 分钟（按 isolate 内存计数，冷启动会重置）；
+- 写接口额外校验同源 Origin；
+- 本地 `python server.py` 不启用鉴权（`/api/me` 返回本地管理员），方便开发调试。
 
 ## 如何更新线上网站
 

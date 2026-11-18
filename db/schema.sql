@@ -43,6 +43,8 @@ CREATE TABLE IF NOT EXISTS rental_history (
     lend_date     TEXT NOT NULL,
     return_date   TEXT,
     status        TEXT NOT NULL CHECK (status IN ('rented', 'returned')),
+    lend_operator TEXT,
+    return_operator TEXT,
     CHECK (
         (status = 'rented' AND return_date IS NULL)
         OR (status = 'returned' AND return_date IS NOT NULL)
@@ -88,4 +90,18 @@ CREATE TABLE IF NOT EXISTS hidden_models (
     model_key  TEXT PRIMARY KEY,
     hidden_at  TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
 );
+
+-- 登录账号（仅线上 Cloudflare 版本使用；本地 Python 版本不启用鉴权）。
+CREATE TABLE IF NOT EXISTS users (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    username      TEXT    NOT NULL COLLATE NOCASE UNIQUE,
+    display_name  TEXT    NOT NULL,
+    password_hash TEXT    NOT NULL,
+    role          TEXT    NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
+    active        INTEGER NOT NULL DEFAULT 1,
+    pwd_ver       INTEGER NOT NULL DEFAULT 0,
+    created_at    TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
+    last_login_at TEXT
+);
+
 

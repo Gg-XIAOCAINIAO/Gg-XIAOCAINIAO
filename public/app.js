@@ -126,6 +126,9 @@ const els = {
   borrowerSuggestions: $("#borrower-suggestions"),
   adminOpenHeader: $("#admin-open-header"),
   adminOpenAdd: $("#admin-open-add"),
+  userChip: $("#user-chip"),
+  userName: $("#user-name"),
+  logoutBtn: $("#logout-btn"),
   adminDrawer: $("#admin-drawer"),
   adminBackdrop: $("#admin-backdrop"),
   adminClose: $("#admin-close"),
@@ -477,6 +480,7 @@ const THUMBNAILS = {
 };
 
 const state = {
+  user: null,
   products: [],
   categories: [],
   borrowers: [],
@@ -570,6 +574,30 @@ function showToast(message) {
   }, 3200);
 }
 
+function isAdmin() {
+  return state.user?.role === "admin";
+}
+
+function operatorCell(record) {
+  const lend = record.lend_operator || "";
+  const ret = record.return_operator || "";
+  if (!lend && !ret) return "—";
+  const parts = [];
+  if (lend) parts.push(`借：${escapeHtml(lend)}`);
+  if (ret) parts.push(`还：${escapeHtml(ret)}`);
+  return `<span class="op-stack">${parts.map((part) => `<span>${part}</span>`).join("")}</span>`;
+}
+
+function applyUser() {
+  const user = state.user;
+  if (!user) return;
+  document.body.dataset.role = user.role;
+  if (els.userChip) {
+    els.userChip.hidden = false;
+    els.userName.textContent = user.display_name || user.username;
+  }
+}
+
 async function api(path, options = {}) {
   const init = { ...options };
   if (init.body && typeof init.body === "object") {
@@ -578,6 +606,11 @@ async function api(path, options = {}) {
   }
   const response = await fetch(path, init);
   const contentType = response.headers.get("content-type") || "";
+  if (response.status === 401) {
+    const next = encodeURIComponent(location.pathname + location.search);
+    location.replace(`/login?next=${next}`);
+    throw new Error("登录已失效，正在跳转登录页…");
+  }
   const data = contentType.includes("application/json") ? await response.json() : null;
   if (!response.ok) {
     throw new Error(data?.error || `请求失败（${response.status}）`);
@@ -1015,12 +1048,12 @@ function renderBorrowers() {
             <h2 class="borrower-name">${escapeHtml(borrower.borrower)}</h2>
             <p class="borrower-count">${active ? `当前借用 ${borrower.total_count} 件` : "当前无借用"}</p>
           </div>
-          <button class="borrower-delete" type="button" data-borrower-delete="${borrower.id}"
+          ${isAdmin() ? `<button class="borrower-delete" type="button" data-borrower-delete="${borrower.id}"
                   aria-label="删除借用人 ${escapeHtml(borrower.borrower)}"
                   title="${active ? `还有 ${borrower.total_count} 件在借，归还后可删除` : "删除借用人"}"
                   ${active ? "disabled" : ""}>
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 4.5h9M6 4.5V3h4v1.5M5 4.5l.4 8h5.2l.4-8M7 7v3.2M9 7v3.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
+          </button>` : ""}
         </div>
         ${borrower.note ? `<p class="borrower-note">${escapeHtml(borrower.note)}</p>` : ""}
         ${items ? `<div class="borrower-items">${items}</div>` : `<p class="borrower-idle">所有器物均已归还</p>`}
@@ -1207,7 +1240,7 @@ function renderHistory() {
   if (!rows.length) {
     els.historyBody.innerHTML = `
       <tr>
-        <td colspan="7" class="table-empty">
+        <td colspan="8" class="table-empty">
           <div class="table-empty-inner">
             <svg viewBox="0 0 36 36" fill="none" aria-hidden="true">
               <circle cx="16" cy="16" r="10" stroke="currentColor" stroke-width="1.3"/>
@@ -1228,11 +1261,12 @@ function renderHistory() {
           <td class="cell-product" title="${escapeHtml(record.product_name)}">${escapeHtml(record.product_name)}</td>
           <td class="cell-muted">${escapeHtml(record.category)}</td>
           <td class="cell-borrower">${escapeHtml(record.borrower)}</td>
+          <td class="cell-operator">${operatorCell(record)}</td>
           <td class="cell-muted">${formatDate(record.lend_date)}</td>
           <td class="cell-muted">${formatDate(record.return_date)}</td>
           <td><span class="status-badge${rented ? " is-rented" : ""}">${rented ? "出租中" : "已归还"}</span></td>
           <td class="history-action-cell">
-            ${rented
+            ${!isAdmin() ? "" : rented
               ? `<button class="history-delete" type="button" disabled
                          aria-label="进行中的借用不能删除" title="进行中的借用请先归还">
                    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 4.5h9M6 4.5V3h4v1.5M5 4.5l.4 8h5.2l.4-8M7 7v3.2M9 7v3.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2704,6 +2738,17 @@ function setupViewer() {
 // ---------------------------------------------------------------------------
 
 function bindEvents() {
+  if (els.logoutBtn) {
+    els.logoutBtn.addEventListener("click", async () => {
+      els.logoutBtn.disabled = true;
+      try {
+        await fetch("/api/logout", { method: "POST" });
+      } finally {
+        location.replace("/login");
+      }
+    });
+  }
+
   els.tabs.forEach((tab) => {
     tab.addEventListener("click", () => setView(tab.dataset.view));
   });
@@ -3103,6 +3148,14 @@ async function init() {
   state.showEmptyCategories = readShowEmptyPreference();
   els.rentDate.value = todayISO();
   els.returnDate.value = todayISO();
+
+  try {
+    const me = await api("/api/me");
+    state.user = me?.user || null;
+    applyUser();
+  } catch (error) {
+    console.error(error);
+  }
 
   try {
     const [products, categories, borrowers, historyAll, models] = await Promise.all([

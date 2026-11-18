@@ -1,4 +1,5 @@
-// 从 server.py 1:1 移植的业务逻辑，跑在 Cloudflare Pages Functions + D1 上。
+﻿// 从 server.py 1:1 移植的业务逻辑，跑在 Cloudflare Pages Functions + D1 上。
+import { hashPassword, verifyPassword } from "./_auth.js";
 // 约定：所有函数第一个参数是 D1 绑定（env.DB），返回与 Python 版本完全一致的 JSON 结构。
 
 export class ApiError extends Error {
@@ -226,6 +227,8 @@ export function toRental(row) {
     lend_date: row.lend_date,
     return_date: row.return_date ?? null,
     status: row.status,
+    lend_operator: row.lend_operator ?? null,
+    return_operator: row.return_operator ?? null,
   };
 }
 
@@ -462,7 +465,7 @@ export async function listHistory(db, filters = {}) {
   const rows = await all(
     db,
     `SELECT id, product_id, product_name, category, borrower,
-            lend_date, return_date, status
+            lend_date, return_date, status, lend_operator, return_operator
        FROM rental_history
        ${where}
       ORDER BY lend_date DESC, id DESC`,
@@ -842,7 +845,7 @@ function normalizeRentalIds(value) {
   return ids;
 }
 
-export async function createRentalsBatch(db, payload) {
+export async function createRentalsBatch(db, payload, operator = null) {
   const borrower = cleanBorrower(payload?.borrower);
   const lendDate = parseIsoDate(payload?.lend_date, "lend_date");
   const productIds = normalizeProductIds(payload?.product_ids);
@@ -872,10 +875,10 @@ export async function createRentalsBatch(db, payload) {
       db
         .prepare(
           `INSERT INTO rental_history
-             (product_id, product_name, category, borrower, lend_date, return_date, status)
-           VALUES (?, ?, ?, ?, ?, NULL, 'rented')`,
+             (product_id, product_name, category, borrower, lend_date, return_date, status, lend_operator)
+           VALUES (?, ?, ?, ?, ?, NULL, 'rented', ?)`,
         )
-        .bind(product.id, product.name, product.category, borrower, lendDate),
+        .bind(product.id, product.name, product.category, borrower, lendDate, operator),
     );
   }
 
@@ -897,17 +900,17 @@ export async function createRentalsBatch(db, payload) {
   return { rentals, products: updatedProducts };
 }
 
-export async function createRental(db, payload) {
+export async function createRental(db, payload, operator = null) {
   const productId = parseInteger(payload?.product_id, "product_id");
   const result = await createRentalsBatch(db, {
     borrower: payload?.borrower,
     lend_date: payload?.lend_date,
     product_ids: [productId],
-  });
+  }, operator);
   return { rental: result.rentals[0], product: result.products[0] };
 }
 
-export async function returnRentalsBatch(db, payload) {
+export async function returnRentalsBatch(db, payload, operator = null) {
   const returnDate = parseIsoDate(payload?.return_date, "return_date");
   const rentalIds = normalizeRentalIds(payload?.rental_ids);
 
@@ -942,9 +945,11 @@ export async function returnRentalsBatch(db, payload) {
     statements.push(
       db
         .prepare(
-          "UPDATE rental_history SET return_date = ?, status = 'returned' WHERE id = ? AND status = 'rented'",
+          `UPDATE rental_history
+              SET return_date = ?, status = 'returned', return_operator = ?
+            WHERE id = ? AND status = 'rented'`,
         )
-        .bind(returnDate, rental.id),
+        .bind(returnDate, operator, rental.id),
     );
   }
   const results = await db.batch(statements);
@@ -960,11 +965,11 @@ export async function returnRentalsBatch(db, payload) {
   return { rentals: updatedRentals, products: updatedProducts };
 }
 
-export async function returnRental(db, rentalId, payload) {
+export async function returnRental(db, rentalId, payload, operator = null) {
   const result = await returnRentalsBatch(db, {
     return_date: payload?.return_date,
     rental_ids: [rentalId],
-  });
+  }, operator);
   return { rental: result.rentals[0], product: result.products[0] };
 }
 
@@ -1038,5 +1043,183 @@ export async function deleteCustomModel(db, modelId) {
   const usage = await modelUsageCount(db, row.model_key);
   if (usage) throw new ApiError(409, `还有 ${usage} 件产品在使用该模型，请先更换`);
   await run(db, "DELETE FROM custom_models WHERE id = ?", modelId);
+  return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// 账号（仅线上版本使用）
+// ---------------------------------------------------------------------------
+
+const USERNAME_PATTERN = /^[A-Za-z0-9_.-]{3,32}$/;
+const USER_ROLES = new Set(["admin", "member"]);
+
+function cleanUsername(value) {
+  if (typeof value !== "string") throw new ApiError(400, "请填写用户名");
+  const username = value.trim();
+  if (!USERNAME_PATTERN.test(username)) {
+    throw new ApiError(400, "用户名需为 3–32 位字母、数字、下划线、点或短横线");
+  }
+  return username;
+}
+
+function cleanPassword(value) {
+  if (typeof value !== "string") throw new ApiError(400, "请填写密码");
+  if (value.length < 8) throw new ApiError(400, "密码至少 8 位");
+  if (value.length > 128) throw new ApiError(400, "密码不能超过 128 位");
+  return value;
+}
+
+function cleanRole(value) {
+  const role = value === undefined || value === null || value === "" ? "member" : String(value);
+  if (!USER_ROLES.has(role)) throw new ApiError(400, "角色无效");
+  return role;
+}
+
+function serializeUser(row) {
+  return {
+    id: Number(row.id),
+    username: row.username,
+    display_name: row.display_name,
+    role: row.role,
+    active: Number(row.active) === 1,
+    created_at: row.created_at,
+    last_login_at: row.last_login_at ?? null,
+  };
+}
+
+export async function findUserByUsername(db, username) {
+  if (typeof username !== "string" || !username.trim()) return null;
+  return first(db, "SELECT * FROM users WHERE username = ? COLLATE NOCASE", username.trim());
+}
+
+export async function touchLastLogin(db, userId) {
+  await run(db, "UPDATE users SET last_login_at = ? WHERE id = ?", shanghaiDateTime(), userId);
+}
+
+export async function listUsers(db) {
+  const rows = await all(db, "SELECT * FROM users ORDER BY id ASC");
+  return rows.map(serializeUser);
+}
+
+async function activeAdminCount(db, excludeId = null) {
+  const row =
+    excludeId === null
+      ? await first(db, "SELECT COUNT(*) AS c FROM users WHERE role = 'admin' AND active = 1")
+      : await first(
+          db,
+          "SELECT COUNT(*) AS c FROM users WHERE role = 'admin' AND active = 1 AND id <> ?",
+          excludeId,
+        );
+  return Number(row ? row.c : 0);
+}
+
+export async function createUser(db, payload, secret, iterations) {
+  const username = cleanUsername(payload?.username);
+  const displayName = cleanText(payload?.display_name, "姓名", 20);
+  const password = cleanPassword(payload?.password);
+  const role = cleanRole(payload?.role);
+  const duplicate = await first(
+    db,
+    "SELECT id FROM users WHERE username = ? COLLATE NOCASE",
+    username,
+  );
+  if (duplicate) throw new ApiError(409, "该用户名已存在");
+  const passwordHash = await hashPassword(password, secret, iterations);
+  const result = await run(
+    db,
+    `INSERT INTO users (username, display_name, password_hash, role, active, pwd_ver, created_at)
+     VALUES (?, ?, ?, ?, 1, 0, ?)`,
+    username,
+    displayName,
+    passwordHash,
+    role,
+    shanghaiDateTime(),
+  );
+  const created = await first(db, "SELECT * FROM users WHERE id = ?", lastRowId(result));
+  return serializeUser(created);
+}
+
+export async function updateUser(db, userId, payload, currentUser, secret, iterations) {
+  const target = await first(db, "SELECT * FROM users WHERE id = ?", userId);
+  if (!target) throw new ApiError(404, "账号不存在");
+  const isSelf = Number(target.id) === Number(currentUser?.id);
+  const updates = [];
+  const params = [];
+
+  if (payload?.display_name !== undefined) {
+    updates.push("display_name = ?");
+    params.push(cleanText(payload.display_name, "姓名", 20));
+  }
+
+  let nextRole = target.role;
+  if (payload?.role !== undefined) {
+    nextRole = cleanRole(payload.role);
+    if (isSelf && nextRole !== target.role) {
+      throw new ApiError(400, "不能修改自己的角色");
+    }
+    updates.push("role = ?");
+    params.push(nextRole);
+  }
+
+  let nextActive = Number(target.active) === 1;
+  if (payload?.active !== undefined) {
+    nextActive = Boolean(payload.active);
+    if (isSelf && !nextActive) throw new ApiError(400, "不能停用自己的账号");
+    updates.push("active = ?");
+    params.push(nextActive ? 1 : 0);
+  }
+
+  const removesAdmin =
+    target.role === "admin" &&
+    Number(target.active) === 1 &&
+    (nextRole !== "admin" || !nextActive);
+  if (removesAdmin && (await activeAdminCount(db, target.id)) === 0) {
+    throw new ApiError(409, "系统至少需要保留一个启用的管理员");
+  }
+
+  if (payload?.password !== undefined && payload?.password !== "") {
+    const password = cleanPassword(payload.password);
+    const passwordHash = await hashPassword(password, secret, iterations);
+    updates.push("password_hash = ?");
+    params.push(passwordHash);
+    updates.push("pwd_ver = pwd_ver + 1");
+  }
+
+  if (!updates.length) throw new ApiError(400, "没有需要修改的内容");
+  params.push(userId);
+  await run(db, `UPDATE users SET ${updates.join(", ")} WHERE id = ?`, ...params);
+  const updated = await first(db, "SELECT * FROM users WHERE id = ?", userId);
+  return serializeUser(updated);
+}
+
+export async function deleteUser(db, userId, currentUser) {
+  const target = await first(db, "SELECT * FROM users WHERE id = ?", userId);
+  if (!target) throw new ApiError(404, "账号不存在");
+  if (Number(target.id) === Number(currentUser?.id)) {
+    throw new ApiError(400, "不能删除自己的账号");
+  }
+  if (target.role === "admin" && Number(target.active) === 1) {
+    if ((await activeAdminCount(db, target.id)) === 0) {
+      throw new ApiError(409, "系统至少需要保留一个启用的管理员");
+    }
+  }
+  await run(db, "DELETE FROM users WHERE id = ?", userId);
+  return { ok: true };
+}
+
+export async function changeOwnPassword(db, currentUser, payload, secret, iterations) {
+  const user = await first(db, "SELECT * FROM users WHERE id = ?", currentUser?.id);
+  if (!user) throw new ApiError(404, "账号不存在");
+  const ok = await verifyPassword(payload?.old_password ?? "", user.password_hash, secret);
+  if (!ok) throw new ApiError(400, "原密码不正确");
+  const password = cleanPassword(payload?.new_password);
+  if (password === payload?.old_password) throw new ApiError(400, "新密码不能与原密码相同");
+  const passwordHash = await hashPassword(password, secret, iterations);
+  await run(
+    db,
+    "UPDATE users SET password_hash = ?, pwd_ver = pwd_ver + 1 WHERE id = ?",
+    passwordHash,
+    user.id,
+  );
   return { ok: true };
 }
