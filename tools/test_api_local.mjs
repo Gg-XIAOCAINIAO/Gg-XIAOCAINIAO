@@ -1,4 +1,4 @@
-﻿// 本地回归测试：覆盖 server.py 原有测试的 9 类场景（借出/归还/品类/历史/模型等）。
+// 本地回归测试：覆盖 server.py 原有测试的 9 类场景（借出/归还/品类/历史/模型等）。
 // 运行：node tools/test_api_local.mjs
 import { mkdirSync, rmSync } from "node:fs";
 import path from "node:path";
@@ -170,10 +170,25 @@ async function main() {
     eq((await req("POST", "/api/rentals/batch", { borrower: "x", lend_date: "2026-01-01", product_ids: [p1, p1] })).status, 400, "duplicate ids rejected");
     eq((await req("POST", "/api/rentals/batch", { borrower: "x", lend_date: "2026-01-01", product_ids: [99999] })).status, 404, "missing product rejected");
 
+    // 4b. 删除产品（在库可删、在借拒绝、历史保留）
+    eq((await req("DELETE", `/api/products/${p1}`)).status, 200, "delete in-stock product");
+    const afterProductDelete = await req("GET", "/api/products");
+    check(!afterProductDelete.data.some((item) => item.id === p1), "deleted product removed from list");
+    const rentP2 = await req("POST", "/api/rentals", {
+      borrower: "删除测试",
+      lend_date: "2026-01-06",
+      product_id: p2,
+    });
+    eq(rentP2.status, 201, "rent p2 before delete attempt");
+    eq((await req("DELETE", `/api/products/${p2}`)).status, 409, "cannot delete rented product");
+    await req("POST", `/api/rentals/${rentP2.data.rental.id}/return`, { return_date: "2026-01-07" });
+    eq((await req("DELETE", `/api/products/${p2}`)).status, 200, "delete product after return");
+    eq((await req("DELETE", `/api/products/99999`)).status, 404, "delete missing product rejected");
+
     // 5. 删除产品后历史保留
     const delCategory = await req("DELETE", `/api/categories/${childId}?cascade=1`);
     eq(delCategory.status, 200, "delete category cascade");
-    check(delCategory.data.deleted_products === 2, "cascade deleted 2 products");
+    check(delCategory.data.deleted_products === 0, "cascade has no products left");
     const historyKept = await req("GET", "/api/history?borrower=" + encodeURIComponent("测试借用人"));
     check(historyKept.data.length === 2, "history survives product delete");
     const productsAfterDelete = await req("GET", "/api/products");

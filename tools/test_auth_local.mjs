@@ -104,6 +104,7 @@ async function main() {
     ok(isAdminOnly("GET", "/api/users"), "users list is admin only");
     ok(isAdminOnly("POST", "/api/categories"), "category create is admin only");
     ok(isAdminOnly("PATCH", "/api/products/1/model"), "model patch is admin only");
+    ok(isAdminOnly("DELETE", "/api/products/1"), "product delete is admin only");
     ok(isAdminOnly("POST", "/api/history"), "manual history is admin only");
     ok(isAdminOnly("DELETE", "/api/borrowers/1"), "borrower delete is admin only");
     ok(!isAdminOnly("POST", "/api/borrowers"), "borrower create allowed for members");

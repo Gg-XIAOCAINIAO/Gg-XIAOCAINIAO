@@ -996,6 +996,41 @@ p {
   letter-spacing: 0.08em;
 }
 
+.collection-side {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.guide-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 29px;
+  padding: 0 12px;
+  border: 1px dashed rgba(163, 168, 160, 0.9);
+  border-radius: 999px;
+  background: rgba(163, 168, 160, 0.1);
+  color: var(--ink-soft);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  transition: color 180ms var(--ease), border-color 180ms var(--ease), background 180ms var(--ease), transform 180ms var(--ease);
+}
+
+.guide-trigger svg {
+  width: 13px;
+  height: 13px;
+  color: var(--sage);
+}
+
+.guide-trigger:hover {
+  border-color: var(--sage);
+  background: var(--white);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
 .product-strip {
   display: flex;
   gap: 12px;
@@ -1077,14 +1112,20 @@ p {
   letter-spacing: 0.04em;
 }
 
+.product-card-wrap {
+  position: relative;
+  flex: 0 0 168px;
+  width: 168px;
+  scroll-snap-align: start;
+}
+
 .product-card {
   position: relative;
   display: grid;
-  flex: 0 0 168px;
   grid-template-columns: 54px minmax(0, 1fr);
   grid-template-rows: auto 1fr auto;
   gap: 3px 10px;
-  width: 168px;
+  width: 100%;
   height: 126px;
   padding: 13px;
   overflow: hidden;
@@ -1094,7 +1135,6 @@ p {
   box-shadow: 0 5px 14px rgba(80, 73, 66, 0.035);
   text-align: left;
   transition: border-color 220ms var(--ease), background 220ms var(--ease), box-shadow 220ms var(--ease), transform 220ms var(--ease);
-  scroll-snap-align: start;
 }
 
 .product-card:hover {
@@ -1186,6 +1226,58 @@ p {
   color: var(--secondary);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* 器物卡片右下角的删除入口：悬停 / 聚焦时加深，在借时禁用。 */
+.product-delete {
+  position: absolute;
+  z-index: 2;
+  right: 9px;
+  bottom: 8px;
+  display: grid;
+  width: 21px;
+  height: 21px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--secondary);
+  opacity: 0.42;
+  place-items: center;
+  transition: opacity 180ms var(--ease), color 180ms var(--ease), border-color 180ms var(--ease), background 180ms var(--ease);
+}
+
+.product-delete svg {
+  width: 12px;
+  height: 12px;
+}
+
+.product-card.is-rented .pc-foot {
+  padding-right: 20px;
+}
+
+.product-card-wrap:hover .product-delete:not(:disabled),
+.product-delete:focus-visible {
+  border-color: var(--line);
+  background: rgba(250, 249, 247, 0.96);
+  color: var(--ink);
+  opacity: 1;
+}
+
+.product-delete:hover:not(:disabled) {
+  border-color: rgba(196, 166, 155, 0.8);
+  color: var(--clay);
+}
+
+.product-delete:disabled {
+  cursor: not-allowed;
+  opacity: 0.14;
+}
+
+@media (hover: none) {
+  .product-delete:not(:disabled) {
+    opacity: 0.72;
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -2355,6 +2447,93 @@ body.modal-open {
 }
 
 /* --------------------------------------------------------------------------
+   Add-product guide
+   -------------------------------------------------------------------------- */
+
+.guide-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-step {
+  display: flex;
+  gap: 13px;
+  padding: 13px 14px;
+  border: 1px solid rgba(221, 217, 212, 0.75);
+  border-radius: 12px;
+  background: var(--white);
+}
+
+.guide-step-index {
+  display: grid;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--hover);
+  color: var(--sage);
+  font-family: var(--font-serif);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  place-items: center;
+}
+
+.guide-step-body {
+  min-width: 0;
+}
+
+.guide-step-body h3 {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+}
+
+.guide-step-body p {
+  margin-top: 3px;
+  color: var(--secondary);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  line-height: 1.65;
+}
+
+.guide-notes {
+  margin-top: 14px;
+  padding: 13px 15px;
+  border-radius: 12px;
+  background: var(--hover);
+}
+
+.guide-notes > strong {
+  display: block;
+  color: var(--secondary);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+.guide-notes ul {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 7px;
+  padding-left: 14px;
+  list-style: disc;
+}
+
+.guide-notes li {
+  color: var(--secondary);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  line-height: 1.65;
+}
+
+/* --------------------------------------------------------------------------
    Model studio
    -------------------------------------------------------------------------- */
 
@@ -3266,6 +3445,51 @@ body.admin-open {
   line-height: 1.55;
 }
 
+.admin-head-tools {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.admin-head-tools .admin-count {
+  padding-top: 0;
+}
+
+.tree-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--secondary);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  transition: color 180ms var(--ease), border-color 180ms var(--ease), background 180ms var(--ease);
+}
+
+.tree-toggle svg {
+  width: 11px;
+  height: 11px;
+  transition: transform 200ms var(--ease);
+}
+
+.tree-toggle.is-collapsed svg {
+  transform: rotate(-90deg);
+}
+
+.tree-toggle:hover {
+  border-color: var(--sage);
+  background: var(--hover);
+  color: var(--ink);
+}
+
 .admin-count {
   flex: 0 0 auto;
   padding-top: 4px;
@@ -3414,6 +3638,87 @@ body.admin-open {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.03em;
   white-space: nowrap;
+}
+
+.tree-caret,
+.tree-caret-spacer {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+}
+
+.tree-caret {
+  display: grid;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--secondary);
+  place-items: center;
+  transition: background 170ms var(--ease), color 170ms var(--ease);
+}
+
+.tree-caret svg {
+  width: 9px;
+  height: 9px;
+  transform: rotate(90deg);
+  transition: transform 180ms var(--ease);
+}
+
+.tree-caret.is-folded svg {
+  transform: rotate(0deg);
+}
+
+.tree-caret:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+
+/* 品类下列出的器物名称与数量 */
+.tree-products {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -2px 12px 10px 36px;
+  padding: 2px 0 2px 10px;
+  border-left: 1px dashed rgba(221, 217, 212, 0.95);
+}
+
+.tree-product {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 3px 9px;
+  border: 1px solid rgba(221, 217, 212, 0.85);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  line-height: 1.45;
+}
+
+.tree-product-name {
+  overflow: hidden;
+  max-width: 190px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tree-product-count {
+  flex: 0 0 auto;
+  color: var(--secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.tree-product-rented {
+  flex: 0 0 auto;
+  padding-left: 6px;
+  border-left: 1px solid rgba(196, 166, 155, 0.55);
+  color: var(--clay);
+  font-size: 9px;
+  letter-spacing: 0.02em;
 }
 
 .tree-actions {
@@ -3793,6 +4098,28 @@ body.admin-open {
     display: none;
   }
 
+  .guide-trigger {
+    height: 25px;
+    padding: 0 9px;
+    gap: 4px;
+    font-size: 9px;
+  }
+
+  .guide-trigger svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .collection-head {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .admin-section-head {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
   .model-trigger {
     width: 30px;
     padding: 0;
@@ -3877,7 +4204,7 @@ body.admin-open {
     max-width: 76%;
   }
 
-  .product-card {
+  .product-card-wrap {
     flex-basis: 154px;
     width: 154px;
   }

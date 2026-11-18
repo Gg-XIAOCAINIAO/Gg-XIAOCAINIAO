@@ -1,4 +1,4 @@
-﻿// 从 server.py 1:1 移植的业务逻辑，跑在 Cloudflare Pages Functions + D1 上。
+// 从 server.py 1:1 移植的业务逻辑，跑在 Cloudflare Pages Functions + D1 上。
 import { hashPassword, verifyPassword } from "./_auth.js";
 // 约定：所有函数第一个参数是 D1 绑定（env.DB），返回与 Python 版本完全一致的 JSON 结构。
 
@@ -720,6 +720,19 @@ export async function deleteCategory(db, categoryId, cascade = false) {
   }
   if (statements.length) await db.batch(statements);
   return { ok: true, deleted_products: deletedProducts };
+}
+
+export async function deleteProduct(db, productId) {
+  const product = await getProduct(db, productId);
+  if (!product) throw new ApiError(404, "产品不存在");
+  if (product.status === "rented") {
+    throw new ApiError(409, `「${product.name}」正在借出，请先归还再删除`);
+  }
+  await db.batch([
+    db.prepare("UPDATE rental_history SET product_id = NULL WHERE product_id = ?").bind(productId),
+    db.prepare("DELETE FROM products WHERE id = ?").bind(productId),
+  ]);
+  return { ok: true, id: productId, name: product.name };
 }
 
 export async function createProducts(db, payload) {

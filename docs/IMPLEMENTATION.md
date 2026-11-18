@@ -193,6 +193,7 @@ conn.execute("UPDATE products SET category = ? WHERE category_id = ?", (name, ca
 ```text
 DELETE /api/categories/:id             有子类 / 产品时返回 409
 DELETE /api/categories/:id?cascade=1   级联删除子类和产品
+DELETE /api/products/:id               删除单件在库产品，在借时返回 409
 ```
 
 级联删除前先检查该品类树中是否有 `rented` 产品；有在借产品则拒绝，避免流水中的进行中记录失去产品。删除产品触发 `rental_history.product_id -> NULL`，历史记录与其 `product_name` 保留。
@@ -342,8 +343,11 @@ conn.commit()
 
 - 新增品类表单：名称 + 归属（「作为一级大类」或选择某个现有大类）；
 - 品类树：每个节点显示产品数 / 在借数，带「添加子类」「改名」「删除」操作；
+- 每个有子类或有器物的节点前有独立折叠按钮（`adminFoldedCategoryIds`），右上角「全部收回 / 全部展开」操作整棵树；折叠只影响该节点的子类与器物，其他分支不受影响；
+- 展开时，各品类下用标签列出直接归属的器物名称、件数与在借件数（`categoryProductList()` 按名称聚合 `state.products`，`Intl.Collator('zh-CN', {numeric:true})` 排序，同品牌自然相邻）；主界面器物列表也用 `sortProductsByName()` 在品类内做同样的排序；
 - 改名采用行内输入，Enter 保存，Esc 取消；
-- 新增产品表单：名称、最末级小类、数量 1–50、展示模型；
+- 新增产品表单：名称、最末级小类、数量 1–50、展示模型；新增品类 / 产品后会自动展开对应路径，避免“加了却看不见”；
+- 器物列表标题右侧「怎么添加产品」按钮打开四步指南弹窗，可一键关闭并打开管理面板；
 - 抽屉底部保留品牌「回声科技」。
 
 [`public/app.js`](../public/app.js#L1156)、[`public/styles.css`](../public/styles.css#L2122)
@@ -547,6 +551,7 @@ const alternatives = state.products.filter((item) =>
 | `PATCH` | `/api/categories/:id` | `{name}` |
 | `DELETE` | `/api/categories/:id` | 可选 `?cascade=1` |
 | `POST` | `/api/products` | `{name, category_id, quantity, model_key}` |
+| `DELETE` | `/api/products/:id` | 删除在库产品；在借时拒绝，历史流水保留 |
 | `PATCH` | `/api/products/:id/model` | `{model_key, scale_x/y/z, finish, seed, scope}` |
 | `POST` | `/api/rentals/batch` | `{borrower, lend_date, product_ids}` |
 | `POST` | `/api/rentals/return-batch` | `{return_date, rental_ids}` |
@@ -568,6 +573,6 @@ const alternatives = state.products.filter((item) =>
 python tests/test_api.py
 ```
 
-9 项测试全部通过，覆盖种子数据、四级品类树、聚合排序、大类 / 小类 / 三级 / 四级筛选、品类增删改、多件借出、批量归还、单件兼容接口、级联删除、历史保留、3D 模型替换与批量应用，以及借用人增删、历史补录 / 删除、GLB 导入 / 删除、内置模型移除 / 恢复。
+10 项测试全部通过，覆盖种子数据、四级品类树、聚合排序、大类 / 小类 / 三级 / 四级筛选、品类增删改、多件借出、批量归还、单件兼容接口、级联删除、单品删除与历史保留、3D 模型替换与批量应用，以及借用人增删、历史补录 / 删除、GLB 导入 / 删除、内置模型移除 / 恢复。
 
 浏览器验收覆盖类目单击展开 / 再次点击缩回、空类目显示开关、器物列表左右滑动、借用人添加 / 删除、历史补录 / 删除、模型库 GLB 导入 / 删除、管理抽屉、行内改名、一次添加两件同款、同款数量加减、同一借用人两件同名器物、批量归还、模型工坊实时预览与保存、移动端断点与控制台零错误。截图见 [`previews/`](../previews/)。交互回归脚本为 `tools/verify_ui.mjs` 与 `tools/verify_features.mjs`。

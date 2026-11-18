@@ -24,6 +24,7 @@ import {
   deleteCategory,
   deleteCustomModel,
   deleteHistory,
+  deleteProduct,
   deleteUser,
   findUserByUsername,
   hideBuiltinModel,
@@ -397,6 +398,11 @@ async function handleWrite(request, env, method, path, searchParams, payload) {
   if (match && method === "DELETE") {
     const cascade = (firstQuery(searchParams, "cascade") || "").toLowerCase();
     return json(200, await deleteCategory(db, Number(match[1]), ["1", "true", "yes"].includes(cascade)));
+  }
+
+  match = path.match(/^\/api\/products\/(\d+)$/);
+  if (match && method === "DELETE") {
+    return json(200, await deleteProduct(db, Number(match[1])));
   }
 
   match = path.match(/^\/api\/products\/(\d+)\/model$/);

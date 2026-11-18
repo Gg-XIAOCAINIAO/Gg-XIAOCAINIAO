@@ -128,7 +128,16 @@
                 <span class="section-label">THE COLLECTION</span>
                 <h2>器物列表</h2>
               </div>
-              <span class="collection-count" id="collection-count">18 件</span>
+              <div class="collection-side">
+                <button class="guide-trigger" id="guide-open" type="button" aria-haspopup="dialog" aria-controls="guide-dialog">
+                  <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                    <circle cx="9" cy="9" r="7.3" stroke="currentColor" stroke-width="1.2"/>
+                    <path d="M9 5.8v6.4M5.8 9h6.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                  </svg>
+                  <span>怎么添加产品</span>
+                </button>
+                <span class="collection-count" id="collection-count">18 件</span>
+              </div>
             </div>
             <div class="strip-shell">
               <button class="strip-arrow strip-arrow--prev" id="strip-prev" type="button" aria-label="向左浏览器物" disabled>
@@ -493,6 +502,63 @@
     </div>
   </dialog>
 
+  <!-- 添加产品指南 -->
+  <dialog class="modal-dialog modal-dialog--wide guide-dialog" id="guide-dialog" aria-labelledby="guide-title">
+    <div class="modal-card">
+      <button class="modal-close" type="button" data-close aria-label="关闭">
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="m3.5 3.5 11 11m0-11-11 11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </button>
+      <span class="section-label">ADD PRODUCT GUIDE</span>
+      <h2 id="guide-title">怎么自己添加产品</h2>
+      <p class="modal-product">跟着四步走，一两分钟就能把新器物登记进系统。</p>
+
+      <ol class="guide-steps">
+        <li class="guide-step">
+          <span class="guide-step-index" aria-hidden="true">01</span>
+          <div class="guide-step-body">
+            <h3>打开管理面板</h3>
+            <p>点页面右上角的「管理」，或左侧「品类」标题旁的「＋」。</p>
+          </div>
+        </li>
+        <li class="guide-step">
+          <span class="guide-step-index" aria-hidden="true">02</span>
+          <div class="guide-step-body">
+            <h3>找到最末级小类</h3>
+            <p>在「品类结构」里确认要归入的小类；没有合适的，就先用「添加品类」新建，并选择它的上级。</p>
+          </div>
+        </li>
+        <li class="guide-step">
+          <span class="guide-step-index" aria-hidden="true">03</span>
+          <div class="guide-step-body">
+            <h3>填写产品信息</h3>
+            <p>在「新增产品」里填名称，选择归属小类、数量（大于 1 会生成多件独立库存）和展示模型。</p>
+          </div>
+        </li>
+        <li class="guide-step">
+          <span class="guide-step-index" aria-hidden="true">04</span>
+          <div class="guide-step-body">
+            <h3>确认添加，回到列表查看</h3>
+            <p>点「新增产品」后，器物列表里就会出现它；如果加错了，把鼠标移到卡片上，点右下角垃圾桶即可删除。</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="guide-notes">
+        <strong>小提示</strong>
+        <ul>
+          <li>产品只能放在最末级小类里，带子类的品类不能直接放产品。</li>
+          <li>同款买了几件，数量填大一点即可，借出时能按件选择。</li>
+          <li>删除产品会保留历史流水，库存里不再显示。</li>
+        </ul>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" data-close>我知道了</button>
+        <button class="btn btn-primary admin-only" id="guide-open-admin" type="button">打开管理面板</button>
+      </div>
+    </div>
+  </dialog>
+
   <!-- 删除确认 -->
   <dialog class="modal-dialog" id="confirm-dialog" aria-labelledby="confirm-title">
     <form method="dialog" class="modal-card confirm-card">
@@ -645,9 +711,18 @@
         <div class="admin-section-head">
           <div>
             <h3>品类结构</h3>
-            <p>支持最多四级分类，随时改名、增删。</p>
+            <p>支持最多四级分类；展开后能看到各品类下的器物与数量。</p>
           </div>
-          <span class="admin-count" id="admin-category-count">—</span>
+          <div class="admin-head-tools">
+            <span class="admin-count" id="admin-category-count">—</span>
+            <button class="tree-toggle" id="admin-tree-toggle" type="button"
+                    aria-expanded="true" aria-controls="category-tree">
+              <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="m2.4 4.4 3.6 3.4 3.6-3.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span id="admin-tree-toggle-label">全部收回</span>
+            </button>
+          </div>
         </div>
 
         <form class="admin-inline-form" id="category-form">

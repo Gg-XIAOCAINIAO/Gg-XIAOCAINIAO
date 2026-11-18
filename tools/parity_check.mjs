@@ -147,10 +147,15 @@ async function main() {
     scope: "same_name",
   });
 
+  await both("delete rented product", "DELETE", `/api/products/${productIds[0]}`);
+
   await both("return batch", "POST", "/api/rentals/return-batch", {
     return_date: "2026-02-03",
     rental_ids: rentalIds,
   });
+
+  await both("delete product", "DELETE", `/api/products/${productIds[0]}`);
+  await both("delete missing product", "DELETE", "/api/products/99999");
 
   await both("delete child cascade", "DELETE", `/api/categories/${childId}?cascade=1`);
   await both("delete root", "DELETE", `/api/categories/${rootId}`);

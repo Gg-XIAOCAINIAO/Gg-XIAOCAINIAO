@@ -717,6 +717,66 @@ class RentalApiTest(unittest.TestCase):
         with self.assertRaises(urllib.error.HTTPError) as caught:
             urllib.request.urlopen(self.base + imported["url"], timeout=10)
         self.assertEqual(caught.exception.code, 404)
+    def test_10_delete_product(self) -> None:
+        status, products = self.request("GET", "/api/products")
+        self.assertEqual(status, 200)
+        available = next(item for item in products if item["status"] == "in_stock")
+
+        status, created = self.request(
+            "POST",
+            "/api/products",
+            {
+                "name": "验收待删产品",
+                "category_id": available["category_id"],
+                "quantity": 2,
+                "model_key": "stool",
+            },
+        )
+        self.assertEqual(status, 201)
+        self.assertEqual(len(created), 2)
+
+        # 删除在库产品：从库存移除，历史流水保留但 product_id 置空
+        status, record = self.request(
+            "POST",
+            "/api/history",
+            {
+                "product_id": created[1]["id"],
+                "borrower": "验收借用人",
+                "lend_date": (TODAY - timedelta(days=6)).isoformat(),
+                "return_date": (TODAY - timedelta(days=2)).isoformat(),
+            },
+        )
+        self.assertEqual(status, 201)
+
+        status, removed = self.request("DELETE", f"/api/products/{created[0]['id']}")
+        self.assertEqual(status, 200)
+        self.assertTrue(removed["ok"])
+        self.assertEqual(removed["name"], "验收待删产品")
+
+        status, after = self.request("GET", "/api/products")
+        self.assertEqual(status, 200)
+        self.assertNotIn(created[0]["id"], [item["id"] for item in after])
+
+        status, _ = self.request("DELETE", f"/api/products/{created[0]['id']}")
+        self.assertEqual(status, 404)
+
+        status, deleted = self.request("DELETE", f"/api/products/{created[1]['id']}")
+        self.assertEqual(status, 200)
+        status, records = self.request(
+            "GET", f"/api/history?q={urllib.parse.quote('验收待删产品')}"
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(len(records), 1)
+        self.assertIsNone(records[0]["product_id"])
+        status, _ = self.request("DELETE", f"/api/history/{record['id']}")
+        self.assertEqual(status, 200)
+
+        # 在借产品不允许删除
+        status, rented_products = self.request("GET", "/api/products")
+        rented = next(item for item in rented_products if item["status"] == "rented")
+        status, payload = self.request("DELETE", f"/api/products/{rented['id']}")
+        self.assertEqual(status, 409)
+        self.assertIn("归还", payload["error"])
 
 
 if __name__ == "__main__":

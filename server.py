@@ -1064,6 +1064,26 @@ def create_products(conn: sqlite3.Connection, payload: dict) -> list[dict]:
     return [to_product(get_product(conn, product_id)) for product_id in created_ids]
 
 
+def delete_product(conn: sqlite3.Connection, product_id: int) -> dict:
+    product = get_product(conn, product_id)
+    if product is None:
+        raise ApiError(404, "产品不存在")
+    if product["status"] == "rented":
+        raise ApiError(409, f"「{product['name']}」正在借出，请先归还再删除")
+
+    try:
+        conn.execute("BEGIN IMMEDIATE")
+        conn.execute("DELETE FROM products WHERE id = ?", (product_id,))
+        conn.commit()
+    except ApiError:
+        conn.rollback()
+        raise
+    except sqlite3.Error:
+        conn.rollback()
+        raise
+    return {"ok": True, "id": product_id, "name": product["name"]}
+
+
 def parse_scale(value: object, field: str) -> float:
     try:
         number = float(value if value not in (None, "") else 1)
@@ -1664,6 +1684,12 @@ class Handler(BaseHTTPRequestHandler):
             if method == "POST" and path == "/api/products":
                 with closing(connect()) as conn:
                     self.send_json(201, create_products(conn, payload))
+                return
+
+            match = re.fullmatch(r"/api/products/(\d+)", path)
+            if match and method == "DELETE":
+                with closing(connect()) as conn:
+                    self.send_json(200, delete_product(conn, int(match.group(1))))
                 return
 
             match = re.fullmatch(r"/api/products/(\d+)/model", path)

@@ -133,6 +133,11 @@ const els = {
   adminBackdrop: $("#admin-backdrop"),
   adminClose: $("#admin-close"),
   adminCategoryCount: $("#admin-category-count"),
+  adminTreeToggle: $("#admin-tree-toggle"),
+  adminTreeToggleLabel: $("#admin-tree-toggle-label"),
+  guideOpen: $("#guide-open"),
+  guideDialog: $("#guide-dialog"),
+  guideOpenAdmin: $("#guide-open-admin"),
   categoryForm: $("#category-form"),
   categoryName: $("#category-name"),
   categoryParent: $("#category-parent"),
@@ -497,6 +502,7 @@ const state = {
   returnItems: [],
   editingCategoryId: null,
   adminOpen: false,
+  adminFoldedCategoryIds: new Set(),
   adminHideTimer: null,
   modelOpen: false,
   modelOriginalProduct: null,
@@ -527,6 +533,9 @@ function escapeHtml(value) {
     "'": "&#39;",
   }[character]));
 }
+
+// 中文按拼音、数字按大小排序，让同品牌 / 同系列的名字自然排在一起。
+const NAME_COLLATOR = new Intl.Collator("zh-CN", { numeric: true, sensitivity: "base" });
 
 function pad(value) {
   return String(value).padStart(2, "0");
@@ -779,6 +788,18 @@ function visibleProducts() {
   return state.products.filter((product) => allowed.has(product.category_id));
 }
 
+// 保持服务端返回的品类顺序，只在同一品类内按名称排，名字相近的自然相邻。
+function sortProductsByName(products) {
+  const groups = new Map();
+  for (const product of products) {
+    if (!groups.has(product.category_id)) groups.set(product.category_id, []);
+    groups.get(product.category_id).push(product);
+  }
+  return Array.from(groups.values()).flatMap((group) =>
+    group.sort((a, b) => NAME_COLLATOR.compare(a.name, b.name)),
+  );
+}
+
 function ensureSelection() {
   const products = visibleProducts();
   if (!products.length) {
@@ -894,22 +915,31 @@ function renderProductStrip() {
     return;
   }
 
-  els.productStrip.innerHTML = products.map((product, index) => {
+  els.productStrip.innerHTML = products.map((product) => {
     const active = product.id === state.selectedId ? " is-active" : "";
     const rented = product.status === "rented";
     const key = modelKey(product);
+    const deleteLabel = rented
+      ? `「${escapeHtml(product.name)}」正在借出，归还后可删除`
+      : `删除「${escapeHtml(product.name)}」`;
     return `
-      <button class="product-card${active}" type="button" data-product-id="${product.id}"
-              aria-pressed="${product.id === state.selectedId}" title="${escapeHtml(product.name)} · ${escapeHtml(product.asset_code)}">
-        <span class="thumb">${THUMBNAILS[key] || THUMBNAILS[isCustomModel(key) ? "generated" : "lounge-chair"]}</span>
-        <span class="pc-overline">${escapeHtml(product.asset_code)} / ${escapeHtml(product.category)}</span>
-        <span class="pc-name">${escapeHtml(product.name)}</span>
-        <span class="pc-foot">
-          <i class="pc-dot${rented ? " is-rented" : ""}" aria-hidden="true"></i>
-          ${rented ? "出租中" : "在库"}
-          ${rented ? `<span class="pc-borrower">${escapeHtml(product.current_borrower || "")}</span>` : ""}
-        </span>
-      </button>
+      <div class="product-card-wrap">
+        <button class="product-card${active}${rented ? " is-rented" : ""}" type="button" data-product-id="${product.id}"
+                aria-pressed="${product.id === state.selectedId}" title="${escapeHtml(product.name)} · ${escapeHtml(product.asset_code)}">
+          <span class="thumb">${THUMBNAILS[key] || THUMBNAILS[isCustomModel(key) ? "generated" : "lounge-chair"]}</span>
+          <span class="pc-overline">${escapeHtml(product.asset_code)} / ${escapeHtml(product.category)}</span>
+          <span class="pc-name">${escapeHtml(product.name)}</span>
+          <span class="pc-foot">
+            <i class="pc-dot${rented ? " is-rented" : ""}" aria-hidden="true"></i>
+            ${rented ? "出租中" : "在库"}
+            ${rented ? `<span class="pc-borrower">${escapeHtml(product.current_borrower || "")}</span>` : ""}
+          </span>
+        </button>
+        ${isAdmin() ? `<button class="product-delete" type="button" data-product-delete="${product.id}"
+                aria-label="${deleteLabel}" title="${deleteLabel}"${rented ? " disabled" : ""}>
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 4.5h9M6 4.5V3h4v1.5M5 4.5l.4 8h5.2l.4-8M7 7v3.2M9 7v3.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>` : ""}
+      </div>
     `;
   }).join("");
   window.requestAnimationFrame(updateStripArrows);
@@ -1005,6 +1035,41 @@ function renderProducts() {
   renderCategories();
   renderProductStrip();
   updateViewerInfo();
+}
+
+async function removeProduct(productId) {
+  const product = state.products.find((item) => item.id === productId);
+  if (!product) return;
+  if (product.status === "rented") {
+    showToast(`「${product.name}」正在借出，请先归还再删除`);
+    return;
+  }
+  const historyCount = state.historyAll.filter(
+    (record) => record.product_id === productId,
+  ).length;
+  const confirmed = await askConfirm(
+    `删除「${product.name}」？`,
+    historyCount
+      ? `编号 ${product.asset_code} 会从库存中移除，${historyCount} 条历史流水仍会保留。`
+      : `编号 ${product.asset_code} 会从库存中移除，删除后不可恢复。`,
+  );
+  if (!confirmed) return;
+  try {
+    await api(`/api/products/${productId}`, { method: "DELETE" });
+    if (state.modelOpen && state.modelOriginalProduct?.id === productId) {
+      closeModelStudio({ restore: false });
+    }
+    await refreshAllData({ preserveSelection: true });
+    // 删掉当前类目最后一件器物后回到「全部」，避免停留在空类目里。
+    if (state.activeCategoryId && !visibleProducts().length) {
+      state.activeCategoryId = null;
+      renderProducts();
+    }
+    if (state.adminOpen) renderAdmin();
+    showToast(`已删除「${product.name}」`);
+  } catch (error) {
+    showToast(error.message);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -2375,6 +2440,14 @@ function populateAdminSelects() {
 function categoryTreeRow(category, depth) {
   const editing = state.editingCategoryId === category.id;
   const tag = ["一级", "二级", "三级", "四级"][depth - 1] || `${depth}级`;
+  const folded = isCategoryFolded(category);
+  const hasDetail = categoryHasDetail(category);
+  const caret = hasDetail
+    ? `<button class="tree-caret${folded ? " is-folded" : ""}" type="button" data-category-toggle="${category.id}"
+              aria-expanded="${!folded}" aria-label="${folded ? "展开" : "收回"} ${escapeHtml(category.name)} 的下一级">
+        <svg viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="m3.2 1.8 3.4 3.2-3.4 3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>`
+    : `<span class="tree-caret-spacer" aria-hidden="true"></span>`;
   const addChild = depth < 4
     ? `<button class="tree-action" type="button" data-category-action="add-child"
               data-id="${category.id}" aria-label="在 ${escapeHtml(category.name)} 下添加子级">
@@ -2390,7 +2463,8 @@ function categoryTreeRow(category, depth) {
     : `<span class="tree-name">${escapeHtml(category.name)}</span>`;
 
   return `
-    <div class="tree-row${depth > 1 ? " tree-child-row" : ""} tree-depth-${depth}">
+    <div class="tree-row${depth > 1 ? " tree-child-row" : ""} tree-depth-${depth}" data-category-id="${category.id}">
+      ${caret}
       <span class="tree-tag">${tag}</span>
       ${nameBlock}
       <span class="tree-stat">${category.product_count} 件 · ${category.borrowed_count} 借出</span>
@@ -2409,15 +2483,63 @@ function categoryTreeRow(category, depth) {
   `;
 }
 
+function categoryProducts(categoryId) {
+  const groups = new Map();
+  for (const product of state.products) {
+    if (product.category_id !== categoryId) continue;
+    const group = groups.get(product.name) || { name: product.name, count: 0, rented: 0 };
+    group.count += 1;
+    if (product.status === "rented") group.rented += 1;
+    groups.set(product.name, group);
+  }
+  return Array.from(groups.values()).sort((a, b) => NAME_COLLATOR.compare(a.name, b.name));
+}
+
+function categoryHasDetail(category) {
+  return category.children.length > 0 || categoryProducts(category.id).length > 0;
+}
+
+function isCategoryFolded(category) {
+  return state.adminFoldedCategoryIds.has(category.id);
+}
+
+function unfoldCategoryPath(categoryId) {
+  let category = findCategory(categoryId);
+  while (category) {
+    state.adminFoldedCategoryIds.delete(category.id);
+    category = category.parent_id ? findCategory(category.parent_id) : null;
+  }
+}
+
+function categoryProductList(category) {
+  if (isCategoryFolded(category)) return "";
+  const groups = categoryProducts(category.id);
+  if (!groups.length) return "";
+  const chips = groups.map((group) => {
+    const hint = `${group.name} · ${group.count} 件${group.rented ? ` · ${group.rented} 件在借` : ""}`;
+    return `
+      <span class="tree-product${group.rented ? " is-rented" : ""}" title="${escapeHtml(hint)}">
+        <span class="tree-product-name">${escapeHtml(group.name)}</span>
+        <span class="tree-product-count">×${group.count}</span>
+        ${group.rented ? `<span class="tree-product-rented">借出 ${group.rented}</span>` : ""}
+      </span>
+    `;
+  }).join("");
+  return `<div class="tree-products" aria-label="${escapeHtml(category.name)} 下的器物">${chips}</div>`;
+}
+
 function renderTreeBranch(category, depth) {
+  const folded = isCategoryFolded(category);
+  const children = !folded && category.children.length
+    ? `<div class="tree-children">${category.children
+        .map((child) => renderTreeBranch(child, depth + 1))
+        .join("")}</div>`
+    : "";
   return `
     <div class="tree-branch">
       ${categoryTreeRow(category, depth)}
-      ${category.children.length
-        ? `<div class="tree-children">${category.children
-            .map((child) => renderTreeBranch(child, depth + 1))
-            .join("")}</div>`
-        : ""}
+      ${categoryProductList(category)}
+      ${children}
     </div>
   `;
 }
@@ -2427,16 +2549,20 @@ function renderCategoryTree() {
     els.categoryTree.innerHTML = `<div class="tree-empty">还没有品类，请先添加一级大类。</div>`;
     return;
   }
-  els.categoryTree.innerHTML = state.categories.map((root) => `
+  els.categoryTree.innerHTML = state.categories.map((root) => {
+    const folded = isCategoryFolded(root);
+    return `
     <div class="tree-root">
       ${categoryTreeRow(root, 1)}
-      ${root.children.length
+      ${categoryProductList(root)}
+      ${!folded && root.children.length
         ? `<div class="tree-children">${root.children
             .map((child) => renderTreeBranch(child, 2))
             .join("")}</div>`
         : ""}
     </div>
-  `).join("");
+  `;
+  }).join("");
 
   if (state.editingCategoryId) {
     window.requestAnimationFrame(() => {
@@ -2454,8 +2580,23 @@ function adminCategoryCount() {
   return `${state.categories.length} 个一级 · ${all.length} 个节点`;
 }
 
+function adminToggleAllFolded() {
+  const detailNodes = flattenCategories().filter((category) => categoryHasDetail(category));
+  const anyExpanded = detailNodes.some((category) => !state.adminFoldedCategoryIds.has(category.id));
+  if (anyExpanded) {
+    detailNodes.forEach((category) => state.adminFoldedCategoryIds.add(category.id));
+  } else {
+    state.adminFoldedCategoryIds.clear();
+  }
+}
+
 function renderAdmin() {
   els.adminCategoryCount.textContent = adminCategoryCount();
+  const detailNodes = flattenCategories().filter((category) => categoryHasDetail(category));
+  const anyExpanded = detailNodes.some((category) => !state.adminFoldedCategoryIds.has(category.id));
+  els.adminTreeToggle.setAttribute("aria-expanded", String(anyExpanded));
+  els.adminTreeToggle.classList.toggle("is-collapsed", !anyExpanded);
+  els.adminTreeToggleLabel.textContent = anyExpanded ? "全部收回" : "全部展开";
   populateAdminSelects();
   renderCategoryTree();
 }
@@ -2496,6 +2637,13 @@ function closeAdmin() {
   }, 320);
 }
 
+function openGuide() {
+  const card = $(".modal-card", els.guideDialog);
+  if (card) card.scrollTop = 0;
+  els.guideDialog.showModal();
+  document.body.classList.add("modal-open");
+}
+
 async function submitCategoryForm(event) {
   event.preventDefault();
   const name = els.categoryName.value.trim();
@@ -2510,13 +2658,14 @@ async function submitCategoryForm(event) {
   button.disabled = true;
   button.textContent = "添加中…";
   try {
-    await api("/api/categories", {
+    const created = await api("/api/categories", {
       method: "POST",
       body: { name, parent_id: parentValue ? Number(parentValue) : null },
     });
     els.categoryName.value = "";
     els.categoryParent.value = "";
     await refreshAllData({ preserveSelection: true });
+    if (created?.id) unfoldCategoryPath(created.id);
     showToast(`已添加品类「${name}」`);
     renderAdmin();
   } catch (error) {
@@ -2609,6 +2758,7 @@ async function submitProductForm(event) {
     els.adminProductQuantity.value = "1";
     await refreshAllData({ preserveSelection: false });
     if (created.length) {
+      unfoldCategoryPath(created[0].category_id);
       state.selectedId = created[0].id;
       state.activeCategoryId = created[0].category_id;
       expandCategoryAncestors(created[0].category_id);
@@ -2639,7 +2789,7 @@ async function refreshAllData({ preserveSelection = true } = {}) {
     api("/api/models"),
   ]);
 
-  state.products = products;
+  state.products = sortProductsByName(products);
   state.categories = categories;
   state.borrowers = borrowers;
   state.historyAll = historyAll;
@@ -2650,6 +2800,9 @@ async function refreshAllData({ preserveSelection = true } = {}) {
   const validIds = new Set(flattenCategories().map((category) => category.id));
   state.expandedCategoryIds = new Set(
     Array.from(state.expandedCategoryIds).filter((id) => validIds.has(id))
+  );
+  state.adminFoldedCategoryIds = new Set(
+    Array.from(state.adminFoldedCategoryIds).filter((id) => validIds.has(id))
   );
 
   renderProducts();
@@ -2768,6 +2921,12 @@ function bindEvents() {
   });
 
   els.productStrip.addEventListener("click", (event) => {
+    const deleteButton = event.target.closest("[data-product-delete]");
+    if (deleteButton) {
+      if (deleteButton.disabled) return;
+      removeProduct(Number(deleteButton.dataset.productDelete));
+      return;
+    }
     const card = event.target.closest(".product-card");
     if (!card) return;
     selectProduct(Number(card.dataset.productId));
@@ -2854,7 +3013,7 @@ function bindEvents() {
     removeHistoryRecord(Number(button.dataset.historyDelete));
   });
 
-  $$("#rent-dialog [data-close], #return-dialog [data-close], #generate-dialog [data-close], #borrower-dialog [data-close], #history-dialog [data-close], #model-library-dialog [data-close]").forEach((button) => {
+  $$("#rent-dialog [data-close], #return-dialog [data-close], #generate-dialog [data-close], #borrower-dialog [data-close], #history-dialog [data-close], #model-library-dialog [data-close], #guide-dialog [data-close]").forEach((button) => {
     button.addEventListener("click", () => closeDialog(button.closest("dialog")));
   });
 
@@ -2946,6 +3105,15 @@ function bindEvents() {
   els.adminOpenAdd.addEventListener("click", openAdmin);
   els.adminClose.addEventListener("click", closeAdmin);
   els.adminBackdrop.addEventListener("click", closeAdmin);
+  els.adminTreeToggle.addEventListener("click", () => {
+    adminToggleAllFolded();
+    renderAdmin();
+  });
+  els.guideOpen.addEventListener("click", openGuide);
+  els.guideOpenAdmin.addEventListener("click", () => {
+    closeDialog(els.guideDialog);
+    openAdmin();
+  });
   els.categoryForm.addEventListener("submit", submitCategoryForm);
   els.productForm.addEventListener("submit", submitProductForm);
   els.adminProductCategory.addEventListener("change", () => {
@@ -3077,6 +3245,18 @@ function bindEvents() {
   });
 
   els.categoryTree.addEventListener("click", (event) => {
+    const caret = event.target.closest("[data-category-toggle]");
+    if (caret) {
+      const categoryId = Number(caret.dataset.categoryToggle);
+      if (state.adminFoldedCategoryIds.has(categoryId)) {
+        state.adminFoldedCategoryIds.delete(categoryId);
+      } else {
+        state.adminFoldedCategoryIds.add(categoryId);
+      }
+      renderAdmin();
+      $(`[data-category-toggle="${categoryId}"]`, els.categoryTree)?.focus();
+      return;
+    }
     const action = event.target.closest("[data-category-action]");
     if (!action) return;
     const categoryId = Number(action.dataset.id);
@@ -3165,13 +3345,13 @@ async function init() {
       api("/api/history"),
       api("/api/models"),
     ]);
-    state.products = products;
+    state.products = sortProductsByName(products);
     state.categories = categories;
     state.borrowers = borrowers;
     state.historyAll = historyAll;
     state.history = historyAll;
     applyModelLibrary(models);
-    state.selectedId = products[0]?.id ?? null;
+    state.selectedId = state.products[0]?.id ?? null;
 
     renderProducts();
     renderBorrowers();
