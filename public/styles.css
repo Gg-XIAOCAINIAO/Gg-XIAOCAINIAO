@@ -1018,6 +1018,14 @@ p {
   transition: color 180ms var(--ease), border-color 180ms var(--ease), background 180ms var(--ease), transform 180ms var(--ease);
 }
 
+.collection-add {
+  height: 29px;
+  padding: 0 13px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
 .guide-trigger svg {
   width: 13px;
   height: 13px;
@@ -4105,6 +4113,12 @@ body.admin-open {
     font-size: 9px;
   }
 
+  .collection-add {
+    height: 25px;
+    padding: 0 9px;
+    font-size: 9px;
+  }
+
   .guide-trigger svg {
     width: 12px;
     height: 12px;
@@ -4349,6 +4363,10 @@ body.admin-open {
    --------------------------------------------------------------------------- */
 
 body:not([data-role="admin"]) .admin-only {
+  display: none !important;
+}
+
+body[data-role="admin"] .member-only {
   display: none !important;
 }
 

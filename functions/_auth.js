@@ -209,19 +209,35 @@ export function isPublicPath(path) {
   return PUBLIC_PATHS.has(path);
 }
 
-/** 需要管理员权限的接口与页面（其余写操作成员可用）。 */
+/**
+ * 成员（member）允许的写操作白名单。
+ *
+ * 采用“默认拒绝”策略：除了这里列出的接口，其余写操作一律要求管理员权限。
+ * 这样以后新增接口时忘记配置，也不会意外对成员开放。
+ */
+const MEMBER_WRITES = [
+  // 库存登记：成员可自助新增产品、新建品类、删除在库产品。
+  ["POST", /^\/api\/categories$/],
+  ["POST", /^\/api\/products$/],
+  ["DELETE", /^\/api\/products\/\d+$/],
+  // 日常借用。
+  ["POST", /^\/api\/borrowers$/],
+  ["POST", /^\/api\/rentals$/],
+  ["POST", /^\/api\/rentals\/batch$/],
+  ["POST", /^\/api\/rentals\/return-batch$/],
+  ["POST", /^\/api\/rentals\/\d+\/return$/],
+  // 自己的账号。
+  ["POST", /^\/api\/logout$/],
+  ["POST", /^\/api\/account\/password$/],
+];
+
+/** 需要管理员权限的接口与页面（成员写操作见 MEMBER_WRITES）。 */
 export function isAdminOnly(method, path) {
   if (path === "/admin" || path.startsWith("/admin/")) return true;
   if (path === "/api/users" || path.startsWith("/api/users/")) return true;
   const upper = String(method || "GET").toUpperCase();
   if (upper === "GET" || upper === "HEAD" || upper === "OPTIONS") return false;
-  if (path.startsWith("/api/categories")) return true;
-  if (path.startsWith("/api/products")) return true;
-  if (path.startsWith("/api/models")) return true;
-  if (path.startsWith("/api/history")) return true;
-  if (path === "/api/borrowers") return false;
-  if (path.startsWith("/api/borrowers/")) return true;
-  return false;
+  return !MEMBER_WRITES.some(([verb, pattern]) => verb === upper && pattern.test(path));
 }
 
 /** 只允许站内相对路径回跳，避免开放重定向。 */

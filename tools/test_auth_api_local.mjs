@@ -107,8 +107,40 @@ async function main() {
     ok(relogin.status === 200 && relogin.cookie, "member can login again", relogin);
     const workerCookie2 = relogin.cookie;
 
-    const forbidden = await dispatch("POST", "/api/categories", { cookie: workerCookie2, body: { name: "成员不该能建" } });
-    ok(forbidden.status === 403, "member cannot create category", forbidden);
+    // 成员可以自助登记库存：建品类 → 建产品 → 删除在库产品
+    const memberCategory = await dispatch("POST", "/api/categories", {
+      cookie: workerCookie2,
+      body: { name: "成员自建小类" },
+    });
+    ok(memberCategory.status === 201, "member can create category", memberCategory);
+
+    const memberProduct = await dispatch("POST", "/api/products", {
+      cookie: workerCookie2,
+      body: {
+        name: "成员自建产品",
+        category_id: memberCategory.data.id,
+        quantity: 1,
+        model_key: "stool",
+      },
+    });
+    ok(memberProduct.status === 201 && memberProduct.data.length === 1, "member can create product", memberProduct);
+    const memberProductId = memberProduct.data[0].id;
+
+    const memberRename = await dispatch("PATCH", `/api/categories/${memberCategory.data.id}`, {
+      cookie: workerCookie2,
+      body: { name: "成员改名" },
+    });
+    ok(memberRename.status === 403, "member cannot rename category", memberRename);
+
+    const memberModel = await dispatch("PATCH", `/api/products/${memberProductId}/model`, {
+      cookie: workerCookie2,
+      body: { model_key: "stool" },
+    });
+    ok(memberModel.status === 403, "member cannot change model", memberModel);
+
+    const memberDelete = await dispatch("DELETE", `/api/products/${memberProductId}`, { cookie: workerCookie2 });
+    ok(memberDelete.status === 200, "member can delete in-stock product", memberDelete);
+
     const usersForbidden = await dispatch("GET", "/api/users", { cookie: workerCookie2 });
     ok(usersForbidden.status === 403, "member cannot list users", usersForbidden);
     const adminPage = await dispatch("GET", "/admin/users", { cookie: workerCookie2 });
@@ -122,6 +154,8 @@ async function main() {
     });
     ok(rent.status === 201, "member can rent", rent);
     const rentalId = rent.data.rental.id;
+    const rentedDelete = await dispatch("DELETE", `/api/products/${stock.id}`, { cookie: workerCookie2 });
+    ok(rentedDelete.status === 409, "member cannot delete rented product", rentedDelete);
     const history = await dispatch("GET", "/api/history", { cookie: adminCookie });
     const record = history.data.find((item) => item.id === rentalId);
     ok(record && record.lend_operator === "测试员工", "lend operator recorded", record);

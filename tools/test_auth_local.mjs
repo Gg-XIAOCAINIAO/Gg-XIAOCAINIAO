@@ -102,16 +102,23 @@ async function main() {
     ok(!isPublicPath("/") && !isPublicPath("/api/products"), "non-public paths");
     ok(isAdminOnly("GET", "/admin/users"), "admin page is admin only");
     ok(isAdminOnly("GET", "/api/users"), "users list is admin only");
-    ok(isAdminOnly("POST", "/api/categories"), "category create is admin only");
+    ok(!isAdminOnly("POST", "/api/categories"), "category create allowed for members");
+    ok(isAdminOnly("PATCH", "/api/categories/1"), "category rename is admin only");
+    ok(isAdminOnly("DELETE", "/api/categories/1"), "category delete is admin only");
     ok(isAdminOnly("PATCH", "/api/products/1/model"), "model patch is admin only");
-    ok(isAdminOnly("DELETE", "/api/products/1"), "product delete is admin only");
+    ok(!isAdminOnly("POST", "/api/products"), "product create allowed for members");
+    ok(!isAdminOnly("DELETE", "/api/products/1"), "product delete allowed for members");
     ok(isAdminOnly("POST", "/api/history"), "manual history is admin only");
+    ok(isAdminOnly("DELETE", "/api/history/1"), "history delete is admin only");
     ok(isAdminOnly("DELETE", "/api/borrowers/1"), "borrower delete is admin only");
     ok(!isAdminOnly("POST", "/api/borrowers"), "borrower create allowed for members");
     ok(!isAdminOnly("POST", "/api/rentals/batch"), "rent allowed for members");
     ok(!isAdminOnly("POST", "/api/rentals/return-batch"), "return allowed for members");
     ok(!isAdminOnly("GET", "/api/products"), "read allowed for members");
+    ok(!isAdminOnly("POST", "/api/logout"), "logout allowed for members");
     ok(!isAdminOnly("POST", "/api/account/password"), "self password change allowed");
+    ok(isAdminOnly("POST", "/api/models/import"), "model import is admin only");
+    ok(isAdminOnly("POST", "/api/unknown-write"), "unknown writes default to admin");
 
     // 回跳地址
     ok(true, "policy checks complete");

@@ -126,18 +126,22 @@ const els = {
   borrowerSuggestions: $("#borrower-suggestions"),
   adminOpenHeader: $("#admin-open-header"),
   adminOpenAdd: $("#admin-open-add"),
+  productAddOpen: $("#product-add-open"),
   userChip: $("#user-chip"),
   userName: $("#user-name"),
   logoutBtn: $("#logout-btn"),
   adminDrawer: $("#admin-drawer"),
   adminBackdrop: $("#admin-backdrop"),
   adminClose: $("#admin-close"),
+  adminEyebrow: $("#admin-eyebrow"),
+  adminTitle: $("#admin-title"),
   adminCategoryCount: $("#admin-category-count"),
   adminTreeToggle: $("#admin-tree-toggle"),
   adminTreeToggleLabel: $("#admin-tree-toggle-label"),
+  adminProductSection: $("#admin-product-section"),
   guideOpen: $("#guide-open"),
   guideDialog: $("#guide-dialog"),
-  guideOpenAdmin: $("#guide-open-admin"),
+  guideOpenAdd: $("#guide-open-add"),
   categoryForm: $("#category-form"),
   categoryName: $("#category-name"),
   categoryParent: $("#category-parent"),
@@ -601,6 +605,12 @@ function applyUser() {
   const user = state.user;
   if (!user) return;
   document.body.dataset.role = user.role;
+  if (els.adminEyebrow) {
+    els.adminEyebrow.textContent = isAdmin() ? "ADMIN CONSOLE" : "ADD PRODUCT";
+  }
+  if (els.adminTitle) {
+    els.adminTitle.textContent = isAdmin() ? "品类与产品" : "添加产品";
+  }
   if (els.userChip) {
     els.userChip.hidden = false;
     els.userName.textContent = user.display_name || user.username;
@@ -935,10 +945,10 @@ function renderProductStrip() {
             ${rented ? `<span class="pc-borrower">${escapeHtml(product.current_borrower || "")}</span>` : ""}
           </span>
         </button>
-        ${isAdmin() ? `<button class="product-delete" type="button" data-product-delete="${product.id}"
+        <button class="product-delete" type="button" data-product-delete="${product.id}"
                 aria-label="${deleteLabel}" title="${deleteLabel}"${rented ? " disabled" : ""}>
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 4.5h9M6 4.5V3h4v1.5M5 4.5l.4 8h5.2l.4-8M7 7v3.2M9 7v3.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>` : ""}
+        </button>
       </div>
     `;
   }).join("");
@@ -2462,6 +2472,16 @@ function categoryTreeRow(category, depth) {
        </div>`
     : `<span class="tree-name">${escapeHtml(category.name)}</span>`;
 
+  // 成员也能新建品类，但改名/删除仍只给管理员。
+  const manageActions = isAdmin()
+    ? `<button class="tree-action" type="button" data-category-action="edit" data-id="${category.id}" aria-label="重命名 ${escapeHtml(category.name)}">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 12.8h2.3L13 5.1 10.9 3 3.3 10.6 3 12.8Z" stroke="currentColor" stroke-width="1.15" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="tree-action is-danger" type="button" data-category-action="delete" data-id="${category.id}" aria-label="删除 ${escapeHtml(category.name)}">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3.5 4.5h9M6 4.5V3h4v1.5M5 4.5l.4 8h5.2l.4-8M7 7v3.2M9 7v3.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>`
+    : "";
+
   return `
     <div class="tree-row${depth > 1 ? " tree-child-row" : ""} tree-depth-${depth}" data-category-id="${category.id}">
       ${caret}
@@ -2471,12 +2491,7 @@ function categoryTreeRow(category, depth) {
       ${editing ? "" : `
         <div class="tree-actions">
           ${addChild}
-          <button class="tree-action" type="button" data-category-action="edit" data-id="${category.id}" aria-label="重命名 ${escapeHtml(category.name)}">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M3 12.8h2.3L13 5.1 10.9 3 3.3 10.6 3 12.8Z" stroke="currentColor" stroke-width="1.15" stroke-linejoin="round"/></svg>
-          </button>
-          <button class="tree-action is-danger" type="button" data-category-action="delete" data-id="${category.id}" aria-label="删除 ${escapeHtml(category.name)}">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M3.5 4.5h9M6 4.5V3h4v1.5M5 4.5l.4 8h5.2l.4-8M7 7v3.2M9 7v3.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
+          ${manageActions}
         </div>
       `}
     </div>
@@ -2601,25 +2616,33 @@ function renderAdmin() {
   renderCategoryTree();
 }
 
-function openAdmin() {
+function openAdmin(focus = "category") {
   if (state.modelOpen) closeModelStudio();
-  if (state.adminOpen) return;
-  state.adminOpen = true;
-  state.editingCategoryId = null;
-  window.clearTimeout(state.adminHideTimer);
-  els.adminBackdrop.hidden = false;
-  els.adminDrawer.hidden = false;
-  window.requestAnimationFrame(() => {
-    els.adminBackdrop.classList.add("is-open");
-    els.adminDrawer.classList.add("is-open");
-  });
-  document.body.classList.add("admin-open");
-  renderAdmin();
-  const suggested = suggestModelForCategory(Number(els.adminProductCategory.value));
-  if (suggested) els.adminProductModel.value = suggested;
+  const alreadyOpen = state.adminOpen;
+  if (!alreadyOpen) {
+    state.adminOpen = true;
+    state.editingCategoryId = null;
+    window.clearTimeout(state.adminHideTimer);
+    els.adminBackdrop.hidden = false;
+    els.adminDrawer.hidden = false;
+    window.requestAnimationFrame(() => {
+      els.adminBackdrop.classList.add("is-open");
+      els.adminDrawer.classList.add("is-open");
+    });
+    document.body.classList.add("admin-open");
+    renderAdmin();
+    const suggested = suggestModelForCategory(Number(els.adminProductCategory.value));
+    if (suggested) els.adminProductModel.value = suggested;
+  }
   window.setTimeout(() => {
-    if (state.adminOpen) els.categoryName.focus();
-  }, 320);
+    if (!state.adminOpen) return;
+    if (focus === "product") {
+      els.adminProductSection?.scrollIntoView({ block: "start", behavior: "smooth" });
+      els.adminProductName.focus({ preventScroll: true });
+    } else {
+      els.categoryName.focus();
+    }
+  }, alreadyOpen ? 0 : 320);
 }
 
 function closeAdmin() {
@@ -2666,8 +2689,18 @@ async function submitCategoryForm(event) {
     els.categoryParent.value = "";
     await refreshAllData({ preserveSelection: true });
     if (created?.id) unfoldCategoryPath(created.id);
-    showToast(`已添加品类「${name}」`);
     renderAdmin();
+    const createdCategory = created?.id ? findCategory(created.id) : null;
+    if (createdCategory && !createdCategory.children.length) {
+      // 新品类一定是最末级小类，直接选进「新增产品」，省得再找一遍。
+      els.adminProductCategory.value = String(created.id);
+      const suggested = suggestModelForCategory(created.id);
+      if (suggested) els.adminProductModel.value = suggested;
+      els.adminProductName.focus();
+      showToast(`已添加品类「${name}」，已选为归属小类`);
+    } else {
+      showToast(`已添加品类「${name}」`);
+    }
   } catch (error) {
     showToast(error.message);
   } finally {
@@ -3101,8 +3134,9 @@ function bindEvents() {
     els.historyShell.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
-  els.adminOpenHeader.addEventListener("click", openAdmin);
-  els.adminOpenAdd.addEventListener("click", openAdmin);
+  els.adminOpenHeader.addEventListener("click", () => openAdmin("category"));
+  els.adminOpenAdd.addEventListener("click", () => openAdmin("category"));
+  els.productAddOpen.addEventListener("click", () => openAdmin("product"));
   els.adminClose.addEventListener("click", closeAdmin);
   els.adminBackdrop.addEventListener("click", closeAdmin);
   els.adminTreeToggle.addEventListener("click", () => {
@@ -3110,9 +3144,9 @@ function bindEvents() {
     renderAdmin();
   });
   els.guideOpen.addEventListener("click", openGuide);
-  els.guideOpenAdmin.addEventListener("click", () => {
+  els.guideOpenAdd.addEventListener("click", () => {
     closeDialog(els.guideDialog);
-    openAdmin();
+    openAdmin("product");
   });
   els.categoryForm.addEventListener("submit", submitCategoryForm);
   els.productForm.addEventListener("submit", submitProductForm);
