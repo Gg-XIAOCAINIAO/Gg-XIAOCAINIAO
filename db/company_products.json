@@ -1,0 +1,3997 @@
+{
+  "generatedAt": "2026-11-18",
+  "source": "\\\\Dxp8800ultra-2a\\拍摄专用\\总盘\\回声科技有限公司\\产品实拍素材（JWH）",
+  "totals": {
+    "categories": 34,
+    "subcategories": 61,
+    "models": 613
+  },
+  "prototypes": [
+    {
+      "id": "P01",
+      "name": "入耳式真无线耳机（TWS + 充电仓）",
+      "geometry": "左右耳豆体为圆角胶囊/豆形体，出音嘴为锥台；充电仓为开盖式圆角方盒（上下壳分缝 + 磁吸凹槽）。",
+      "size": "耳豆 2.2×1.8×2.0；仓 6.0×4.5×2.5",
+      "material": "壳体白/黑/磨砂；硅胶耳塞；仓盖半透明或亮面",
+      "budget": "6k–10k tris",
+      "priority": "P0"
+    },
+    {
+      "id": "P02",
+      "name": "耳夹式耳机（C 形夹）",
+      "geometry": "左右各一个 C 形记忆金属夹臂 + 前后两个豆体（电池仓/声学仓）；夹臂为扫掠管体，豆体为倒角胶囊。",
+      "size": "夹臂张开 4.5；豆体 Ø1.6×1.2",
+      "material": "夹臂亮面金属或亲肤涂层；豆体撞色",
+      "budget": "5k–8k tris",
+      "priority": "P0"
+    },
+    {
+      "id": "P03",
+      "name": "挂耳式耳机（耳挂）",
+      "geometry": "耳廓后方的 U 形挂梁 + 前置出音体；挂梁截面为扁椭圆，绕耳甲腔走线。",
+      "size": "挂梁弧长 8；出音体 2.6×1.6×1.2",
+      "material": "TPE/液态硅胶 + 亮面涂层",
+      "budget": "6k–9k tris",
+      "priority": "P0"
+    },
+    {
+      "id": "P04",
+      "name": "骨传导耳机（后挂一体）",
+      "geometry": "颈后一根细横梁连接两侧振子模块，形成 U 形后挂 + 双耳外侧贴片；整体薄片化。",
+      "size": "跨度 14；振子模块 3.5×2.4×1.2",
+      "material": "哑光硅胶 + 金属点缀",
+      "budget": "5k–8k tris",
+      "priority": "P1"
+    },
+    {
+      "id": "P05",
+      "name": "头戴式降噪耳机（包耳）",
+      "geometry": "双椭圆耳罩 + C 形头梁 + 伸缩滑轨 + 旋转关节；耳罩内外双层壳体，含耳垫环。",
+      "size": "耳罩 9×7.5×4；头梁跨 17",
+      "material": "耳垫蛋白皮/绒；壳体哑光塑料 + 金属件",
+      "budget": "15k–25k tris",
+      "priority": "P0"
+    },
+    {
+      "id": "P06",
+      "name": "头戴式游戏耳机（带麦克风）",
+      "geometry": "同 P05 结构，增加侧置吊杆麦克风（可旋转收放）+ 耳罩外侧环形灯带 + 网布耳垫。",
+      "size": "耳罩 10×8.5×4.5；麦杆长 12",
+      "material": "磨砂黑/白 + 发光灯环（emissive）",
+      "budget": "18k–30k tris",
+      "priority": "P0"
+    },
+    {
+      "id": "P07",
+      "name": "有线入耳式耳机（IEM + 线材）",
+      "geometry": "腔体为类耳甲腔的注塑壳体 + 金属出音嘴 + 0.78mm 双针母座；线材为曲线扫掠管，含分线器与 3.5mm 插头。",
+      "size": "腔体 2.4×1.8×1.6；线长 120",
+      "material": "面板树脂/金属；编织线 + 金属插头",
+      "budget": "8k–12k tris",
+      "priority": "P0"
+    },
+    {
+      "id": "P08",
+      "name": "机械键盘（按配列参数化）",
+      "geometry": "上下壳 + 定位板 + 键帽阵列；键帽用实例化复用同一 R1–R4 几何，按 60/65/68/75/87/98/108 配列改变行列数。",
+      "size": "宽 29–44 × 深 10–14 × 高 3–4.5",
+      "material": "键帽 PBT 撞色；外壳磨砂/透明亚克力",
+      "budget": "20k–40k tris",
+      "priority": "P0"
+    },
+    {
+      "id": "P09",
+      "name": "鼠标（电竞轻量化）",
+      "geometry": "左右分体上盖 + 背部隆起 + 侧键 + 底部脚贴；外形用 3 条横向轮廓线 loft 壳体。",
+      "size": "12.5×6.5×4.0",
+      "material": "哑光/磨砂 + 半透明底壳 + 灯条",
+      "budget": "8k–12k tris",
+      "priority": "P0"
+    },
+    {
+      "id": "P10",
+      "name": "鼠标垫（平面板材）",
+      "geometry": "带缝边的圆角矩形薄板，厚度 0.2–0.5cm；大桌垫为 90×40 规格，表面贴图即图案。",
+      "size": "45×40×0.4 / 90×40×0.4",
+      "material": "布面纹理 / 树脂硬垫 / 玻璃垫",
+      "budget": "0.5k–2k tris",
+      "priority": "P1"
+    },
+    {
+      "id": "P11",
+      "name": "人体工学椅",
+      "geometry": "椅背（分区腰托）+ 坐垫 + 5 爪底座 + 气压杆 + 4D 扶手；网背用带透明贴图的单层曲面。",
+      "size": "高 110–130；坐宽 50；底座 Ø70",
+      "material": "网布 + 尼龙/铝合金 + 皮面坐垫",
+      "budget": "30k–50k tris",
+      "priority": "P1"
+    },
+    {
+      "id": "P12",
+      "name": "显示器（按尺寸参数化）",
+      "geometry": "屏幕为薄板 + 后壳隆起 + 支架立柱与底座；按 24/27/32/34 寸改变宽高比（16:9 或 21:9）。",
+      "size": "27 寸 61.3×36.5×5；底座 20×18",
+      "material": "边框哑光黑 + 屏面（可切换亮/暗材质）",
+      "budget": "8k–15k tris",
+      "priority": "P0"
+    },
+    {
+      "id": "P13",
+      "name": "显示器支架（气弹簧臂）",
+      "geometry": "夹桌底座 + 立柱 + 两段臂 + VESA 头；臂为矩形管，关节处加圆柱铰链。",
+      "size": "臂展 30–60；立柱高 40",
+      "material": "喷砂金属 + 塑料装饰盖",
+      "budget": "10k–18k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P14",
+      "name": "投影仪（桌面方盒）",
+      "geometry": "圆角立方体 + 前置镜头筒 + 顶部调焦环 + 散热格栅；镜头为多段圆柱。",
+      "size": "22×20×15",
+      "material": "白/灰哑光 + 玻璃镜头 + 织物网罩",
+      "budget": "8k–12k tris",
+      "priority": "P1"
+    },
+    {
+      "id": "P15",
+      "name": "电视",
+      "geometry": "超薄屏体 + 窄边框 + 中央或双侧支脚 + 背部挂架凹槽。",
+      "size": "55 寸 123×71×7；65 寸 145×83×7",
+      "material": "金属中框 + 屏面 + 磨砂背板",
+      "budget": "5k–8k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P16",
+      "name": "桌面音响（2.0/2.1）",
+      "geometry": "左右两只圆角箱体（倒相孔）+ 底部脚垫；2.1 再加低音炮立方体。",
+      "size": "单箱 10×16×12；低音炮 20×25×22",
+      "material": "木纹/MDF + 织物网罩 + RGB 灯环",
+      "budget": "8k–14k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P17",
+      "name": "充电宝（含磁吸款）",
+      "geometry": "圆角长方体或超薄卡片，正面磁吸环凹槽、侧面电量数显窗、底部 USB-C 口与线材。",
+      "size": "磁吸卡片 10×6.6×0.9；大容量 15×7×3",
+      "material": "哑光 PC/金属 + 数显屏",
+      "budget": "3k–6k tris",
+      "priority": "P1"
+    },
+    {
+      "id": "P18",
+      "name": "充电头（氮化镓）",
+      "geometry": "小立方/方块 + 可折叠插脚 + 1–3 个 Type-C 口；插脚为旋转副。",
+      "size": "5.5×5.5×3.2",
+      "material": "白/亮面 + 金属插脚",
+      "budget": "2k–4k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P19",
+      "name": "手机散热背夹（磁吸）",
+      "geometry": "圆角方板 + 中心风扇（旋转叶轮）+ 磁吸环；夹持款加两侧弹簧夹臂。",
+      "size": "6.5×6.5×2.5",
+      "material": "半透明壳 + RGB 灯 + 铝制散热片",
+      "budget": "6k–10k tris",
+      "priority": "P1"
+    },
+    {
+      "id": "P20",
+      "name": "游戏手柄",
+      "geometry": "手柄本体（双握把放样）+ 十字键 + ABXY + 双摇杆 + 肩键扳机；摇杆与扳机做可动关节。",
+      "size": "15.5×10.5×6.0",
+      "material": "磨砂塑料 + 橡胶握把 + 灯带",
+      "budget": "15k–25k tris",
+      "priority": "P1"
+    },
+    {
+      "id": "P21",
+      "name": "移动固态硬盘",
+      "geometry": "圆角小方块/卡片，金属中框 + 顶部 Logo 面 + 侧面 Type-C。",
+      "size": "8.5×5.0×1.2",
+      "material": "阳极氧化铝 + 硅胶套",
+      "budget": "2k–4k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P22",
+      "name": "手机",
+      "geometry": "直板机身 + 前后玻璃 + 摄像头模组凸起（多摄圆环）+ 侧键。",
+      "size": "16.2×7.5×0.8",
+      "material": "玻璃/钛金属 + 屏幕材质",
+      "budget": "8k–12k tris",
+      "priority": "P1"
+    },
+    {
+      "id": "P23",
+      "name": "平板",
+      "geometry": "大尺寸直板 + 均匀边框 + 后置单摄 + 磁吸触点。",
+      "size": "25×17.5×0.6",
+      "material": "铝合金 + 屏幕",
+      "budget": "5k–8k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P24",
+      "name": "扫地机器人（含基站）",
+      "geometry": "圆盘机身 + 顶部激光雷达塔 + 前置缓冲防撞板；可选配基站（高塔 + 清水箱）。",
+      "size": "主机 Ø35×10；基站 40×45×55",
+      "material": "白/黑亮面 + 透明尘盒",
+      "budget": "12k–20k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P25",
+      "name": "洗地机 / 吸尘器",
+      "geometry": "立式机身：地刷 + 长杆 + 手柄，杆上有清水箱/污水箱；吸尘器版为枪式手持 + 尘杯。",
+      "size": "整机高 110；地刷 30×12",
+      "material": "磨砂塑料 + 透明水箱",
+      "budget": "12k–18k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P26",
+      "name": "冰箱",
+      "geometry": "多门立柜：冷藏/冷冻分区 + 隐藏式把手 + 底部散热格栅。",
+      "size": "90×70×180",
+      "material": "金属拉丝或玻璃面板",
+      "budget": "3k–6k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P27",
+      "name": "空调（壁挂内机）",
+      "geometry": "长条圆角箱体 + 下方出风口导风板（可动）+ 顶部进风格栅。",
+      "size": "90×30×22",
+      "material": "白色亮面 + 深色出风口",
+      "budget": "3k–5k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P28",
+      "name": "电动牙刷",
+      "geometry": "手柄（扁圆放样）+ 刷头（可更换）+ 底座充电座。",
+      "size": "手柄 Ø2.6×18；刷头 2.5×1.2",
+      "material": "亮面塑料 + 硅胶防滑 + 金属环",
+      "budget": "5k–8k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P29",
+      "name": "刮胡刀（往复/旋转）",
+      "geometry": "手握柄体 + 三个旋转刀头（或往复刀网）+ 顶部刀网盖。",
+      "size": "16×6×5",
+      "material": "磨砂金属 + 亮面塑料",
+      "budget": "6k–10k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P30",
+      "name": "血压计（臂式）",
+      "geometry": "主机盒体 + 倾斜显示屏 + 袖带（可卷曲带体 + 魔术贴）+ 气管。",
+      "size": "主机 14×10×6；袖带 40×14",
+      "material": "白色 ABS + 织物袖带",
+      "budget": "6k–9k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P31",
+      "name": "助听器（耳背式/耳内式）",
+      "geometry": "耳背式：豆形机身 + 透明导声管 + 耳塞；耳内式：定制耳甲腔壳体。",
+      "size": "机身 2.0×1.2×0.8",
+      "material": "肤色亮面 + 透明管",
+      "budget": "3k–5k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P32",
+      "name": "按摩仪（颈部/眼部）",
+      "geometry": "C 形颈环（或眼罩式）+ 内侧按摩头凸起 + 控制按键。",
+      "size": "颈环开口 14；环径 13",
+      "material": "亲肤硅胶 + 金属触点",
+      "budget": "6k–10k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P33",
+      "name": "按摩椅",
+      "geometry": "靠背 + 坐垫 + 双侧扶手 + 小腿按摩段（可升降）；整体为包覆式软体。",
+      "size": "145×75×115",
+      "material": "皮质 + 织物内衬",
+      "budget": "25k–40k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P34",
+      "name": "跑步机",
+      "geometry": "跑带平台 + 两侧扶手 + 前置立柱与屏幕 + 折叠铰链。",
+      "size": "180×80×130",
+      "material": "金属管架 + 橡胶跑带",
+      "budget": "12k–20k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P35",
+      "name": "升降桌",
+      "geometry": "桌面 + 双电机立柱 + 横梁 + 控制面板；立柱做伸缩动画。",
+      "size": "140×70；高 72–120",
+      "material": "桌面木纹/竹纹 + 白色钢架",
+      "budget": "8k–12k tris",
+      "priority": "P2"
+    },
+    {
+      "id": "P36",
+      "name": "行李箱",
+      "geometry": "圆角箱体 + 可伸缩拉杆 + 四角万向轮 + 拉链分缝。",
+      "size": "20 寸 55×35×23；24 寸 65×42×26",
+      "material": "PC 亮面/铝框 + 织物内衬",
+      "budget": "8k–12k tris",
+      "priority": "P1"
+    },
+    {
+      "id": "P37",
+      "name": "服装（羽绒服/棉服/夏装）",
+      "geometry": "建议不做完整布料：用半身人台 + 服装薄壳表示，避免布料解算。",
+      "size": "人台高 90",
+      "material": "布料贴图 + 轻量褶皱法线",
+      "budget": "5k–10k tris",
+      "priority": "P3"
+    },
+    {
+      "id": "P38",
+      "name": "杯（保温杯/其他）",
+      "geometry": "圆柱/锥台杯体 + 螺纹杯盖 + 硅胶圈。",
+      "size": "Ø7×22",
+      "material": "不锈钢 + 哑光涂层",
+      "budget": "2k–4k tris",
+      "priority": "P3"
+    },
+    {
+      "id": "P39",
+      "name": "路由器",
+      "geometry": "扁平机身 + 多根可折叠天线 + 散热格栅 + 状态灯。",
+      "size": "24×16×4；天线 15",
+      "material": "哑光黑 + 亮面顶盖",
+      "budget": "3k–6k tris",
+      "priority": "P3"
+    },
+    {
+      "id": "P40",
+      "name": "宽带（服务，无实体）",
+      "geometry": "非实体器材，建议网站用服务卡片 + 图标表示，不需要 3D 模型。",
+      "size": "—",
+      "material": "—",
+      "budget": "—",
+      "priority": "P3"
+    }
+  ],
+  "categories": [
+    {
+      "name": "耳机",
+      "modelCount": 284,
+      "subcategories": [
+        {
+          "name": "半入耳式耳机",
+          "prototype": "P01",
+          "models": [
+            {
+              "brand": "OPPO",
+              "model": "Enco Air5s",
+              "raw": "OPPO Enco Air5s"
+            },
+            {
+              "brand": "万魔",
+              "model": "Q32",
+              "raw": "万魔 Q32"
+            },
+            {
+              "brand": "华为",
+              "model": "FreeBuds 4E",
+              "raw": "华为FreeBuds 4E"
+            },
+            {
+              "brand": "华为",
+              "model": "FreeBuds 6",
+              "raw": "华为FreeBuds 6"
+            },
+            {
+              "brand": "泥炭",
+              "model": "Air6 HS",
+              "raw": "泥炭 Air6 HS"
+            },
+            {
+              "brand": "漫步者",
+              "model": "原子豆ANC",
+              "raw": "漫步者 原子豆ANC"
+            },
+            {
+              "brand": "瓷音未来",
+              "model": "Mars 2",
+              "raw": "瓷音未来 Mars 2"
+            },
+            {
+              "brand": "瓷音未来",
+              "model": "Mars 2i",
+              "raw": "瓷音未来 Mars 2i"
+            },
+            {
+              "brand": "西圣",
+              "model": "AVA2PRO",
+              "raw": "西圣 AVA2PRO"
+            }
+          ]
+        },
+        {
+          "name": "蓝牙耳机",
+          "prototype": "P01",
+          "models": [
+            {
+              "brand": "OPPO",
+              "model": "Enco Air4 Pro",
+              "raw": "OPPO Enco Air4 Pro"
+            },
+            {
+              "brand": "OPPO",
+              "model": "Enco Free4",
+              "raw": "OPPO Enco Free4"
+            },
+            {
+              "brand": "OPPO",
+              "model": "Enco X3",
+              "raw": "OPPO Enco X3"
+            },
+            {
+              "brand": "QCY",
+              "model": "N20",
+              "raw": "QCY N20"
+            },
+            {
+              "brand": "QCY",
+              "model": "N60",
+              "raw": "QCY N60"
+            },
+            {
+              "brand": "QCY",
+              "model": "N70",
+              "raw": "QCY N70"
+            },
+            {
+              "brand": "Redmi",
+              "model": "Buds 5 Pro",
+              "raw": "Redmi Buds 5 Pro"
+            },
+            {
+              "brand": "TOZO",
+              "model": "NC9",
+              "raw": "TOZO NC9"
+            },
+            {
+              "brand": "VIVO",
+              "model": "TWS 3i",
+              "raw": "VIVO TWS 3i"
+            },
+            {
+              "brand": "VIVO",
+              "model": "TWS 5",
+              "raw": "VIVO TWS 5"
+            },
+            {
+              "brand": "iKF",
+              "model": "Ultra",
+              "raw": "iKF Ultra"
+            },
+            {
+              "brand": "iKF",
+              "model": "fun Max",
+              "raw": "iKF fun Max"
+            },
+            {
+              "brand": "一加",
+              "model": "Buds 4",
+              "raw": "一加 Buds 4"
+            },
+            {
+              "brand": "万魔",
+              "model": "Q30",
+              "raw": "万魔 Q30"
+            },
+            {
+              "brand": "倍思",
+              "model": "MP1",
+              "raw": "倍思 MP1"
+            },
+            {
+              "brand": "兴戈",
+              "model": "空岚FLD200",
+              "raw": "兴戈 空岚FLD200"
+            },
+            {
+              "brand": "华为",
+              "model": "FreeBuds 7i",
+              "raw": "华为FreeBuds 7i"
+            },
+            {
+              "brand": "华为",
+              "model": "FreeBuds SE 2",
+              "raw": "华为FreeBuds SE 2"
+            },
+            {
+              "brand": "华为",
+              "model": "FreeBuds SE 3",
+              "raw": "华为FreeBuds SE 3"
+            },
+            {
+              "brand": "华为",
+              "model": "freebuds pro5",
+              "raw": "华为 freebuds pro5"
+            },
+            {
+              "brand": "原道",
+              "model": "原点",
+              "raw": "原道 原点"
+            },
+            {
+              "brand": "咪帅",
+              "model": "琉璃max",
+              "raw": "咪帅 琉璃max"
+            },
+            {
+              "brand": "咪帅",
+              "model": "琉璃pro",
+              "raw": "咪帅 琉璃pro"
+            },
+            {
+              "brand": "唐麦",
+              "model": "M4 pro",
+              "raw": "唐麦 M4 pro"
+            },
+            {
+              "brand": "塞那",
+              "model": "S6S Ultra",
+              "raw": "塞那 S6S Ultra"
+            },
+            {
+              "brand": "塞那",
+              "model": "Z50 Ultra",
+              "raw": "塞那 Z50 Ultra"
+            },
+            {
+              "brand": "声阔",
+              "model": "C30i",
+              "raw": "声阔 C30i"
+            },
+            {
+              "brand": "弱水时砂",
+              "model": "Earfeel i5",
+              "raw": "弱水时砂 Earfeel i5"
+            },
+            {
+              "brand": "弱水时砂",
+              "model": "Earfeel i7",
+              "raw": "弱水时砂 Earfeel i7"
+            },
+            {
+              "brand": "弱水时砂",
+              "model": "琉璃mk2",
+              "raw": "弱水时砂 琉璃mk2"
+            },
+            {
+              "brand": "弱水时砂",
+              "model": "琉璃ultra",
+              "raw": "弱水时砂 琉璃ultra"
+            },
+            {
+              "brand": "松下",
+              "model": "AZ80",
+              "raw": "松下 AZ80"
+            },
+            {
+              "brand": "水月雨",
+              "model": "太空漫游2",
+              "raw": "水月雨 太空漫游2"
+            },
+            {
+              "brand": "水月雨",
+              "model": "太空漫游2 ultra",
+              "raw": "水月雨 太空漫游2 ultra"
+            },
+            {
+              "brand": "水月雨",
+              "model": "梦回2",
+              "raw": "水月雨 梦回2"
+            },
+            {
+              "brand": "泥炭",
+              "model": "H3",
+              "raw": "泥炭 H3"
+            },
+            {
+              "brand": "漫步者",
+              "model": "FitBuds pro",
+              "raw": "漫步者 FitBuds pro"
+            },
+            {
+              "brand": "漫步者",
+              "model": "Lolli Pro SE",
+              "raw": "漫步者 Lolli Pro SE"
+            },
+            {
+              "brand": "漫步者",
+              "model": "lolli pro5",
+              "raw": "漫步者 lolli pro5"
+            },
+            {
+              "brand": "漫步者",
+              "model": "原子豆 evo",
+              "raw": "漫步者 原子豆 evo"
+            },
+            {
+              "brand": "漫步者",
+              "model": "原子豆plus",
+              "raw": "漫步者 原子豆plus"
+            },
+            {
+              "brand": "漫步者",
+              "model": "天籁",
+              "raw": "漫步者 天籁"
+            },
+            {
+              "brand": "熙彼儿",
+              "model": "S13",
+              "raw": "熙彼儿 S13"
+            },
+            {
+              "brand": "熙彼儿",
+              "model": "WS200 pro",
+              "raw": "熙彼儿 WS200 pro"
+            },
+            {
+              "brand": "熙彼儿",
+              "model": "wf200",
+              "raw": "熙彼儿 wf200"
+            },
+            {
+              "brand": "籁特易耳",
+              "model": "星环2",
+              "raw": "籁特易耳 星环2"
+            },
+            {
+              "brand": "籁特易耳",
+              "model": "星环Ultra",
+              "raw": "籁特易耳 星环Ultra"
+            },
+            {
+              "brand": "索尼",
+              "model": "降噪豆 XM5",
+              "raw": "索尼 降噪豆 XM5"
+            },
+            {
+              "brand": "红米",
+              "model": "Buds 5 Pro",
+              "raw": "红米 Buds 5 Pro"
+            },
+            {
+              "brand": "红米",
+              "model": "Buds 6 Pro",
+              "raw": "红米 Buds 6 Pro"
+            },
+            {
+              "brand": "苹果",
+              "model": "Airpods Pro3",
+              "raw": "苹果 Airpods Pro3"
+            },
+            {
+              "brand": "蛇圣",
+              "model": "小悠",
+              "raw": "蛇圣 小悠"
+            },
+            {
+              "brand": "蛇圣",
+              "model": "小梦",
+              "raw": "蛇圣 小梦"
+            },
+            {
+              "brand": "觅声",
+              "model": "双子星pro",
+              "raw": "觅声 双子星pro"
+            },
+            {
+              "brand": "音贝奇",
+              "model": "real2 pro",
+              "raw": "音贝奇 real2 pro"
+            }
+          ]
+        },
+        {
+          "name": "耳夹式耳机",
+          "prototype": "P02",
+          "models": [
+            {
+              "brand": "88拉",
+              "model": "DL3",
+              "raw": "88拉 DL3"
+            },
+            {
+              "brand": "MOVA",
+              "model": "TPEAK Clip Pro",
+              "raw": "MOVA TPEAK Clip Pro"
+            },
+            {
+              "brand": "OPPO",
+              "model": "EncoClip2",
+              "raw": "OPPO EncoClip2"
+            },
+            {
+              "brand": "QCY",
+              "model": "C50S",
+              "raw": "QCY C50S"
+            },
+            {
+              "brand": "QCY",
+              "model": "c50",
+              "raw": "QCY c50"
+            },
+            {
+              "brand": "TOZO",
+              "model": "Open earRing",
+              "raw": "TOZO Open earRing"
+            },
+            {
+              "brand": "ikf",
+              "model": "air clip pro",
+              "raw": "ikf air clip pro"
+            },
+            {
+              "brand": "ikf",
+              "model": "air clip2",
+              "raw": "ikf air clip2"
+            },
+            {
+              "brand": "万魔",
+              "model": "S20 Pro",
+              "raw": "万魔 S20 Pro"
+            },
+            {
+              "brand": "万魔",
+              "model": "S20 Ultra",
+              "raw": "万魔 S20 Ultra"
+            },
+            {
+              "brand": "万魔",
+              "model": "S52",
+              "raw": "万魔S52"
+            },
+            {
+              "brand": "丽耳",
+              "model": "Clip 2",
+              "raw": "丽耳 Clip 2"
+            },
+            {
+              "brand": "倍思",
+              "model": "MC2 S",
+              "raw": "倍思 MC2 S"
+            },
+            {
+              "brand": "兴戈",
+              "model": "圆气 OnClip ONE",
+              "raw": "兴戈 圆气 OnClip ONE"
+            },
+            {
+              "brand": "华为",
+              "model": "FreeClip 2",
+              "raw": "华为 FreeClip 2"
+            },
+            {
+              "brand": "南卡",
+              "model": "clip X",
+              "raw": "南卡 clip X"
+            },
+            {
+              "brand": "南卡",
+              "model": "clip pro",
+              "raw": "南卡clip pro"
+            },
+            {
+              "brand": "南卡",
+              "model": "clip super2",
+              "raw": "南卡 clip super2"
+            },
+            {
+              "brand": "南卡",
+              "model": "clip-E",
+              "raw": "南卡 clip-E"
+            },
+            {
+              "brand": "咪帅",
+              "model": "MP10",
+              "raw": "咪帅 MP10"
+            },
+            {
+              "brand": "哈趣",
+              "model": "Ace1",
+              "raw": "哈趣 Ace1"
+            },
+            {
+              "brand": "唐麦",
+              "model": "Q5",
+              "raw": "唐麦 Q5"
+            },
+            {
+              "brand": "唐麦",
+              "model": "Q6",
+              "raw": "唐麦 Q6"
+            },
+            {
+              "brand": "唐麦",
+              "model": "Q8",
+              "raw": "唐麦 Q8"
+            },
+            {
+              "brand": "唐麦",
+              "model": "q6 pro",
+              "raw": "唐麦q6 pro"
+            },
+            {
+              "brand": "塞那",
+              "model": "S7S AI",
+              "raw": "塞那 S7S AI"
+            },
+            {
+              "brand": "塞那",
+              "model": "S7S ultra",
+              "raw": "塞那 S7S ultra"
+            },
+            {
+              "brand": "塞那",
+              "model": "S8S AI",
+              "raw": "塞那 S8S AI"
+            },
+            {
+              "brand": "塞那",
+              "model": "s6s",
+              "raw": "塞那s6s"
+            },
+            {
+              "brand": "声阔",
+              "model": "AeroClip",
+              "raw": "声阔 AeroClip"
+            },
+            {
+              "brand": "小幽",
+              "model": "C Halo",
+              "raw": "小幽 C Halo"
+            },
+            {
+              "brand": "弱水时砂",
+              "model": "ASTRO X",
+              "raw": "弱水时砂 ASTRO X"
+            },
+            {
+              "brand": "弱水时砂",
+              "model": "openfeel",
+              "raw": "弱水时砂 openfeel"
+            },
+            {
+              "brand": "弱水时砂",
+              "model": "茉莉",
+              "raw": "弱水时砂 茉莉"
+            },
+            {
+              "brand": "弱水时砂",
+              "model": "风信子",
+              "raw": "弱水时砂 风信子"
+            },
+            {
+              "brand": "当贝",
+              "model": "air1",
+              "raw": "当贝 air1"
+            },
+            {
+              "brand": "戴灵",
+              "model": "c6 pro",
+              "raw": "戴灵 c6 pro"
+            },
+            {
+              "brand": "拜雅",
+              "model": "AMIRON ZBRO",
+              "raw": "拜雅 AMIRON ZBRO"
+            },
+            {
+              "brand": "拜雅",
+              "model": "动力阿米罗 zero",
+              "raw": "拜雅 动力阿米罗 zero"
+            },
+            {
+              "brand": "水月雨",
+              "model": "PILL音乐胶囊",
+              "raw": "水月雨 PILL音乐胶囊"
+            },
+            {
+              "brand": "泥炭",
+              "model": "clip 1",
+              "raw": "泥炭 clip 1"
+            },
+            {
+              "brand": "泥炭",
+              "model": "pop clip2",
+              "raw": "泥炭 pop clip2"
+            },
+            {
+              "brand": "漫步者",
+              "model": "Fitclip ultra",
+              "raw": "漫步者 Fitclip ultra"
+            },
+            {
+              "brand": "漫步者",
+              "model": "LolliClip SE",
+              "raw": "漫步者 LolliClip SE"
+            },
+            {
+              "brand": "漫步者",
+              "model": "元气仓",
+              "raw": "漫步者 元气仓"
+            },
+            {
+              "brand": "漫步者",
+              "model": "猫眼耳夹",
+              "raw": "漫步者 猫眼耳夹"
+            },
+            {
+              "brand": "熙彼儿",
+              "model": "B12",
+              "raw": "熙彼儿 B12"
+            },
+            {
+              "brand": "熙彼儿",
+              "model": "EC200",
+              "raw": "熙彼儿 EC200"
+            },
+            {
+              "brand": "瓷音未来",
+              "model": "mars x",
+              "raw": "瓷音未来 mars x"
+            },
+            {
+              "brand": "竹林鸟",
+              "model": "笙箫",
+              "raw": "竹林鸟 笙箫"
+            },
+            {
+              "brand": "索爱",
+              "model": "GK6",
+              "raw": "索爱 GK6"
+            },
+            {
+              "brand": "虹觅",
+              "model": "Clip Pro",
+              "raw": "虹觅 Clip Pro"
+            },
+            {
+              "brand": "虹觅",
+              "model": "air2",
+              "raw": "虹觅 air2"
+            },
+            {
+              "brand": "蛇圣",
+              "model": "米朵",
+              "raw": "蛇圣米朵"
+            },
+            {
+              "brand": "蛇圣",
+              "model": "陨石pro",
+              "raw": "蛇圣 陨石pro"
+            },
+            {
+              "brand": "西圣",
+              "model": "AirClip",
+              "raw": "西圣-AirClip"
+            },
+            {
+              "brand": "西圣",
+              "model": "Ares2",
+              "raw": "西圣 Ares2"
+            },
+            {
+              "brand": "西圣",
+              "model": "Plume",
+              "raw": "西圣 Plume"
+            },
+            {
+              "brand": "觅声",
+              "model": "北极星",
+              "raw": "觅声 北极星"
+            },
+            {
+              "brand": "音贝奇",
+              "model": "clip lite",
+              "raw": "音贝奇 clip lite"
+            },
+            {
+              "brand": "韶音",
+              "model": "OPENDOTS ONE",
+              "raw": "韶音 OPENDOTS ONE"
+            }
+          ]
+        },
+        {
+          "name": "挂耳式耳机",
+          "prototype": "P03",
+          "models": [
+            {
+              "brand": "南卡",
+              "model": "OE mix",
+              "raw": "南卡 OE mix"
+            },
+            {
+              "brand": "南卡",
+              "model": "OE mix2",
+              "raw": "南卡 OE mix2"
+            },
+            {
+              "brand": "唐麦",
+              "model": "s5",
+              "raw": "唐麦 s5"
+            },
+            {
+              "brand": "塞那",
+              "model": "G6s",
+              "raw": "塞那 G6s"
+            },
+            {
+              "brand": "布迦尼",
+              "model": "B16",
+              "raw": "布迦尼 B16"
+            },
+            {
+              "brand": "布迦尼",
+              "model": "B16福特联名款",
+              "raw": "布迦尼 B16福特联名款"
+            },
+            {
+              "brand": "戴灵",
+              "model": "OS3",
+              "raw": "戴灵 OS3"
+            },
+            {
+              "brand": "拜雅",
+              "model": "AMIRON 200",
+              "raw": "拜雅 AMIRON 200"
+            },
+            {
+              "brand": "斌雀",
+              "model": "岚",
+              "raw": "斌雀 岚"
+            },
+            {
+              "brand": "漫步者",
+              "model": "fitfree",
+              "raw": "漫步者 fitfree"
+            },
+            {
+              "brand": "熙彼儿",
+              "model": "B1",
+              "raw": "熙彼儿 B1"
+            },
+            {
+              "brand": "熙彼儿",
+              "model": "B9",
+              "raw": "熙彼儿 B9"
+            },
+            {
+              "brand": "蛇圣",
+              "model": "天琴",
+              "raw": "蛇圣 天琴"
+            },
+            {
+              "brand": "西圣",
+              "model": "Olite2",
+              "raw": "西圣 Olite2"
+            },
+            {
+              "brand": "音贝奇",
+              "model": "open air",
+              "raw": "音贝奇 open air"
+            }
+          ]
+        },
+        {
+          "name": "骨传导耳机",
+          "prototype": "P04",
+          "models": [
+            {
+              "brand": "南卡",
+              "model": "Air",
+              "raw": "南卡 Air"
+            },
+            {
+              "brand": "南卡",
+              "model": "Runner Pro 5",
+              "raw": "南卡 Runner Pro 5"
+            },
+            {
+              "brand": "南卡",
+              "model": "Runner air",
+              "raw": "南卡 Runner air"
+            },
+            {
+              "brand": "南卡",
+              "model": "Runner4",
+              "raw": "南卡 Runner4"
+            },
+            {
+              "brand": "南卡",
+              "model": "runner3",
+              "raw": "南卡 runner3"
+            },
+            {
+              "brand": "园世",
+              "model": "Beta pro",
+              "raw": "园世 Beta pro"
+            },
+            {
+              "brand": "塞那",
+              "model": "A50s",
+              "raw": "塞那 A50s"
+            },
+            {
+              "brand": "塞那",
+              "model": "B33S",
+              "raw": "塞那 B33S"
+            },
+            {
+              "brand": "奢音",
+              "model": "x6 Pro",
+              "raw": "奢音 x6 Pro"
+            },
+            {
+              "brand": "奢音",
+              "model": "x7air",
+              "raw": "奢音 x7air"
+            },
+            {
+              "brand": "奢音",
+              "model": "x9",
+              "raw": "奢音 x9"
+            },
+            {
+              "brand": "小幽",
+              "model": "x7pro",
+              "raw": "小幽 x7pro"
+            },
+            {
+              "brand": "弱水时砂",
+              "model": "speakfeel",
+              "raw": "弱水时砂 speakfeel"
+            },
+            {
+              "brand": "戴灵",
+              "model": "S700",
+              "raw": "戴灵 S700"
+            },
+            {
+              "brand": "戴灵",
+              "model": "s820",
+              "raw": "戴灵 s820"
+            },
+            {
+              "brand": "竹林鸟",
+              "model": "战鼓x8",
+              "raw": "竹林鸟 战鼓x8"
+            },
+            {
+              "brand": "竹林鸟",
+              "model": "抚琴",
+              "raw": "竹林鸟 抚琴"
+            },
+            {
+              "brand": "竹林鸟",
+              "model": "旗鼓x9",
+              "raw": "竹林鸟 旗鼓x9"
+            }
+          ]
+        },
+        {
+          "name": "头戴降噪耳机",
+          "prototype": "P05",
+          "models": [
+            {
+              "brand": "CMF",
+              "model": "Headphone Pro",
+              "raw": "CMF Headphone Pro"
+            },
+            {
+              "brand": "JBL",
+              "model": "T770NC",
+              "raw": "JBLT770NC"
+            },
+            {
+              "brand": "QCY",
+              "model": "H3S",
+              "raw": "QCY H3S"
+            },
+            {
+              "brand": "SONY",
+              "model": "XM5",
+              "raw": "SONY XM5"
+            },
+            {
+              "brand": "TOZO",
+              "model": "H20",
+              "raw": "TOZO H20"
+            },
+            {
+              "brand": "TOZO",
+              "model": "H20 双金标版",
+              "raw": "TOZO H20 双金标版"
+            },
+            {
+              "brand": "iKF",
+              "model": "king pro 3.0",
+              "raw": "iKF king pro 3.0"
+            },
+            {
+              "brand": "iKF",
+              "model": "mars",
+              "raw": "iKF mars"
+            },
+            {
+              "brand": "oneodio",
+              "model": "pro10",
+              "raw": "oneodio pro10"
+            },
+            {
+              "brand": "万魔",
+              "model": "HQ51",
+              "raw": "万魔 HQ51"
+            },
+            {
+              "brand": "万魔",
+              "model": "HQ60",
+              "raw": "万魔 HQ60"
+            },
+            {
+              "brand": "兴戈",
+              "model": "空屿 EH500",
+              "raw": "兴戈 空屿 EH500"
+            },
+            {
+              "brand": "南卡",
+              "model": "Odeum",
+              "raw": "南卡 Odeum"
+            },
+            {
+              "brand": "咪帅",
+              "model": "觉醒 MAX",
+              "raw": "咪帅 觉醒 MAX"
+            },
+            {
+              "brand": "唐麦",
+              "model": "H5 lite",
+              "raw": "唐麦 H5 lite"
+            },
+            {
+              "brand": "唐麦",
+              "model": "H5Max",
+              "raw": "唐麦H5Max"
+            },
+            {
+              "brand": "弱水时砂",
+              "model": "寒武纪",
+              "raw": "弱水时砂 寒武纪"
+            },
+            {
+              "brand": "悠律",
+              "model": "Ux",
+              "raw": "悠律 Ux"
+            },
+            {
+              "brand": "森海塞尔",
+              "model": "MOMENTUM4",
+              "raw": "森海塞尔 MOMENTUM4"
+            },
+            {
+              "brand": "水月雨",
+              "model": "羽翼",
+              "raw": "水月雨 羽翼"
+            },
+            {
+              "brand": "水月雨",
+              "model": "羽翼 Edge",
+              "raw": "水月雨 羽翼 Edge"
+            },
+            {
+              "brand": "漫步者",
+              "model": "Atom Max",
+              "raw": "漫步者 Atom Max"
+            },
+            {
+              "brand": "漫步者",
+              "model": "Fit900NB",
+              "raw": "漫步者 Fit900NB"
+            },
+            {
+              "brand": "熙彼儿",
+              "model": "CH500 (Y9)",
+              "raw": "熙彼儿 CH500 (Y9)"
+            },
+            {
+              "brand": "熙彼儿",
+              "model": "Y1",
+              "raw": "熙彼儿 Y1"
+            },
+            {
+              "brand": "瓷音未来",
+              "model": "mars max",
+              "raw": "瓷音未来 mars max"
+            },
+            {
+              "brand": "籁特易耳",
+              "model": "星纪",
+              "raw": "籁特易耳 星纪"
+            },
+            {
+              "brand": "索尼",
+              "model": "XM5",
+              "raw": "索尼 XM5"
+            },
+            {
+              "brand": "蛇圣",
+              "model": "仰望者",
+              "raw": "蛇圣 仰望者"
+            },
+            {
+              "brand": "西伯利亚羽",
+              "model": "DM02",
+              "raw": "西伯利亚羽DM02"
+            },
+            {
+              "brand": "西圣",
+              "model": "H1",
+              "raw": "西圣 H1"
+            },
+            {
+              "brand": "西圣",
+              "model": "H1 Pro",
+              "raw": "西圣 H1 Pro"
+            }
+          ]
+        },
+        {
+          "name": "头戴游戏耳机",
+          "prototype": "P06",
+          "models": [
+            {
+              "brand": "88拉",
+              "model": "北极星",
+              "raw": "88拉 北极星"
+            },
+            {
+              "brand": "CHERRY",
+              "model": "樱桃",
+              "raw": "CHERRY 樱桃"
+            },
+            {
+              "brand": "EPZ",
+              "model": "GM55",
+              "raw": "EPZ GM55"
+            },
+            {
+              "brand": "IKF",
+              "model": "VP7",
+              "raw": "IKF VP7"
+            },
+            {
+              "brand": "IKF",
+              "model": "影刺 Pro",
+              "raw": "IKF 影刺 Pro"
+            },
+            {
+              "brand": "iKF",
+              "model": "V11 Max",
+              "raw": "iKF V11 Max"
+            },
+            {
+              "brand": "iKF",
+              "model": "V11 Pro",
+              "raw": "iKF-V11 Pro"
+            },
+            {
+              "brand": "iKF",
+              "model": "V11 Pro2.0",
+              "raw": "iKF V11 Pro2.0"
+            },
+            {
+              "brand": "兴戈",
+              "model": "EP5",
+              "raw": "兴戈 EP5"
+            },
+            {
+              "brand": "兴戈",
+              "model": "光噬EG280",
+              "raw": "兴戈 光噬EG280"
+            },
+            {
+              "brand": "寸渊",
+              "model": "影弑",
+              "raw": "寸渊 影弑"
+            },
+            {
+              "brand": "弱水时砂",
+              "model": "浩天使",
+              "raw": "弱水时砂 浩天使"
+            },
+            {
+              "brand": "水月雨",
+              "model": "光束",
+              "raw": "水月雨 光束"
+            },
+            {
+              "brand": "水月雨",
+              "model": "兰2",
+              "raw": "水月雨 兰2"
+            },
+            {
+              "brand": "漫步者",
+              "model": "G2",
+              "raw": "漫步者 G2"
+            },
+            {
+              "brand": "漫步者",
+              "model": "G2无线版",
+              "raw": "漫步者 G2无线版"
+            },
+            {
+              "brand": "漫步者",
+              "model": "G3 MAX",
+              "raw": "漫步者 G3 MAX"
+            },
+            {
+              "brand": "漫步者",
+              "model": "战神A5",
+              "raw": "漫步者战神A5"
+            },
+            {
+              "brand": "漫步者",
+              "model": "风刃",
+              "raw": "漫步者 风刃"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "A7 PRO",
+              "raw": "狼蛛 A7 PRO"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "G7 Pro V2",
+              "raw": "狼蛛 G7 Pro V2"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "G7pro",
+              "raw": "狼蛛G7pro"
+            },
+            {
+              "brand": "瓷音未来",
+              "model": "link50",
+              "raw": "瓷音未来 link50"
+            },
+            {
+              "brand": "竹林鸟",
+              "model": "ZG2 玄武",
+              "raw": "竹林鸟-ZG2 玄武"
+            },
+            {
+              "brand": "竹林鸟",
+              "model": "朱雀ZG3",
+              "raw": "竹林鸟 朱雀ZG3"
+            },
+            {
+              "brand": "竹林鸟",
+              "model": "玄武ZG2",
+              "raw": "竹林鸟 玄武ZG2"
+            },
+            {
+              "brand": "绯乐",
+              "model": "曜",
+              "raw": "绯乐 曜"
+            },
+            {
+              "brand": "西伯利亚",
+              "model": "K03s",
+              "raw": "西伯利亚K03s"
+            },
+            {
+              "brand": "西伯利亚",
+              "model": "S21MAX",
+              "raw": "西伯利亚 S21MAX"
+            },
+            {
+              "brand": "西伯利亚",
+              "model": "T10",
+              "raw": "西伯利亚 T10"
+            },
+            {
+              "brand": "西伯利亚",
+              "model": "T7 GT",
+              "raw": "西伯利亚 T7 GT"
+            },
+            {
+              "brand": "西伯利亚",
+              "model": "x21max",
+              "raw": "西伯利亚x21max"
+            },
+            {
+              "brand": "觅声",
+              "model": "射手座",
+              "raw": "觅声射手座"
+            },
+            {
+              "brand": "觅声",
+              "model": "白羊座",
+              "raw": "觅声 白羊座"
+            },
+            {
+              "brand": "觅声",
+              "model": "阿尔法",
+              "raw": "觅声 阿尔法"
+            },
+            {
+              "brand": "赛睿",
+              "model": "寒冰 Arctis Nova 7",
+              "raw": "赛睿 寒冰 Arctis Nova 7"
+            },
+            {
+              "brand": "迈从",
+              "model": "G9 pro",
+              "raw": "迈从G9 pro"
+            },
+            {
+              "brand": "迈从",
+              "model": "x9",
+              "raw": "迈从x9"
+            },
+            {
+              "brand": "钛度",
+              "model": "THS326 刺骨",
+              "raw": "钛度 THS326 刺骨"
+            },
+            {
+              "brand": "钛度",
+              "model": "THS326 甲胄",
+              "raw": "钛度 THS326 甲胄"
+            },
+            {
+              "brand": "钛度",
+              "model": "斩月",
+              "raw": "钛度 斩月"
+            },
+            {
+              "brand": "钛度",
+              "model": "甲胄",
+              "raw": "钛度甲胄"
+            }
+          ]
+        },
+        {
+          "name": "有线耳机",
+          "prototype": "P07",
+          "models": [
+            {
+              "brand": "CVJ",
+              "model": "NEKO",
+              "raw": "CVJ NEKO"
+            },
+            {
+              "brand": "CVJ",
+              "model": "NIKO",
+              "raw": "CVJ NIKO"
+            },
+            {
+              "brand": "CVJ",
+              "model": "刃影",
+              "raw": "CVJ 刃影"
+            },
+            {
+              "brand": "CVJ",
+              "model": "小希",
+              "raw": "CVJ 小希"
+            },
+            {
+              "brand": "CVJ",
+              "model": "界鸣",
+              "raw": "CVJ 界鸣"
+            },
+            {
+              "brand": "CVJ",
+              "model": "蝶鱼",
+              "raw": "CVJ 蝶鱼"
+            },
+            {
+              "brand": "CVJ",
+              "model": "鲽鱼",
+              "raw": "CVJ 鲽鱼"
+            },
+            {
+              "brand": "EPZ",
+              "model": "G10",
+              "raw": "EPZ G10"
+            },
+            {
+              "brand": "EPZ",
+              "model": "G10 Pro",
+              "raw": "EPZ G10 Pro"
+            },
+            {
+              "brand": "EPZ",
+              "model": "G20",
+              "raw": "EPZ G20"
+            },
+            {
+              "brand": "EPZ",
+              "model": "G20 Pro",
+              "raw": "EPZ G20 Pro"
+            },
+            {
+              "brand": "EPZ",
+              "model": "G30",
+              "raw": "EPZ G30"
+            },
+            {
+              "brand": "EPZ",
+              "model": "P40",
+              "raw": "EPZ P40"
+            },
+            {
+              "brand": "EPZ",
+              "model": "P50",
+              "raw": "EPZ P50"
+            },
+            {
+              "brand": "EPZ",
+              "model": "k9",
+              "raw": "EPZ k9"
+            },
+            {
+              "brand": "IKF",
+              "model": "夜祭",
+              "raw": "IKF 夜祭"
+            },
+            {
+              "brand": "IKF",
+              "model": "夜祭 二代",
+              "raw": "IKF 夜祭 二代"
+            },
+            {
+              "brand": "KZ",
+              "model": "gale 疾风",
+              "raw": "KZ gale 疾风"
+            },
+            {
+              "brand": "KZ",
+              "model": "战斧",
+              "raw": "KZ 战斧"
+            },
+            {
+              "brand": "SIVGA",
+              "model": "SM100",
+              "raw": "SIVGA SM100"
+            },
+            {
+              "brand": "SIVGA",
+              "model": "琴鸟",
+              "raw": "SIVGA 琴鸟"
+            },
+            {
+              "brand": "TNR",
+              "model": "海螺",
+              "raw": "TNR 海螺"
+            },
+            {
+              "brand": "VGN",
+              "model": "魔竞",
+              "raw": "VGN 魔竞"
+            },
+            {
+              "brand": "兴戈",
+              "model": "EA500LM",
+              "raw": "兴戈 EA500LM"
+            },
+            {
+              "brand": "兴戈",
+              "model": "SuperMix 5",
+              "raw": "兴戈 SuperMix 5"
+            },
+            {
+              "brand": "咪帅",
+              "model": "奔雷",
+              "raw": "咪帅 奔雷"
+            },
+            {
+              "brand": "唐麦",
+              "model": "凌云",
+              "raw": "唐麦 凌云"
+            },
+            {
+              "brand": "唐麦",
+              "model": "凌霄",
+              "raw": "唐麦 凌霄"
+            },
+            {
+              "brand": "寸渊",
+              "model": "夜凰NYX",
+              "raw": "寸渊 夜凰NYX"
+            },
+            {
+              "brand": "弱水时砂",
+              "model": "静海 II",
+              "raw": "弱水时砂 静海 II"
+            },
+            {
+              "brand": "弱水时砂",
+              "model": "静海2",
+              "raw": "弱水时砂 静海2"
+            },
+            {
+              "brand": "水月雨",
+              "model": "Blessing3",
+              "raw": "水月雨 Blessing3"
+            },
+            {
+              "brand": "水月雨",
+              "model": "咏叹调2",
+              "raw": "水月雨 咏叹调2"
+            },
+            {
+              "brand": "水月雨",
+              "model": "竹2",
+              "raw": "水月雨 竹2"
+            },
+            {
+              "brand": "水月雨",
+              "model": "终章KADENZ",
+              "raw": "水月雨 终章KADENZ"
+            },
+            {
+              "brand": "漫步者",
+              "model": "战擎",
+              "raw": "漫步者 战擎"
+            },
+            {
+              "brand": "瓷音未来",
+              "model": "Link3 黑武士",
+              "raw": "瓷音未来 Link3 黑武士"
+            },
+            {
+              "brand": "竹林鸟",
+              "model": "惊鸿z3",
+              "raw": "竹林鸟 惊鸿z3"
+            },
+            {
+              "brand": "竹林鸟",
+              "model": "麒麟ZG1",
+              "raw": "竹林鸟 麒麟ZG1"
+            },
+            {
+              "brand": "绯乐",
+              "model": "涟2",
+              "raw": "绯乐 涟2"
+            },
+            {
+              "brand": "绯乐",
+              "model": "涟3",
+              "raw": "绯乐 涟3"
+            },
+            {
+              "brand": "绯乐",
+              "model": "虹",
+              "raw": "绯乐 虹"
+            },
+            {
+              "brand": "觅声",
+              "model": "双子座 pro",
+              "raw": "觅声 双子座 pro"
+            },
+            {
+              "brand": "觅声",
+              "model": "天鹤座",
+              "raw": "觅声 天鹤座"
+            },
+            {
+              "brand": "觅声",
+              "model": "天鹤座2",
+              "raw": "觅声 天鹤座2"
+            },
+            {
+              "brand": "钛度",
+              "model": "暗鸦m",
+              "raw": "钛度 暗鸦m"
+            },
+            {
+              "brand": "钛度",
+              "model": "破晓 曜2",
+              "raw": "钛度 破晓 曜2"
+            },
+            {
+              "brand": "钛度",
+              "model": "破晓·耀",
+              "raw": "钛度 破晓·耀"
+            }
+          ]
+        },
+        {
+          "name": "未分类（商单/单测）",
+          "prototype": "P01",
+          "models": [
+            {
+              "brand": "声阔",
+              "model": "Liberty 4 Pro",
+              "raw": "声阔 Liberty 4 Pro"
+            },
+            {
+              "brand": "声阔",
+              "model": "飞跃线 Plus",
+              "raw": "声阔 飞跃线 Plus"
+            },
+            {
+              "brand": "漫步者",
+              "model": "NeoBuds Pro 3",
+              "raw": "漫步者 NeoBuds Pro 3"
+            },
+            {
+              "brand": "韶音",
+              "model": "OpenRun PRO2",
+              "raw": "韶音 OpenRun PRO2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "键盘",
+      "modelCount": 73,
+      "subcategories": [
+        {
+          "name": "60 配列",
+          "prototype": "P08",
+          "models": [
+            {
+              "brand": "重力星球",
+              "model": "V60",
+              "raw": "重力星球 V60"
+            },
+            {
+              "brand": "重力星球",
+              "model": "V60pro",
+              "raw": "重力星球 V60pro"
+            }
+          ]
+        },
+        {
+          "name": "61 配列",
+          "prototype": "P08",
+          "models": [
+            {
+              "brand": "钛度",
+              "model": "H61k",
+              "raw": "钛度 H61k"
+            }
+          ]
+        },
+        {
+          "name": "63 配列",
+          "prototype": "P08",
+          "models": [
+            {
+              "brand": "ATK",
+              "model": "RS 63 air",
+              "raw": "ATK RS 63 air"
+            },
+            {
+              "brand": "iqunix",
+              "model": "EV 63",
+              "raw": "iqunix EV 63"
+            }
+          ]
+        },
+        {
+          "name": "65 配列",
+          "prototype": "P08",
+          "models": [
+            {
+              "brand": "WOB",
+              "model": "zen 65RT",
+              "raw": "WOB zen 65RT"
+            },
+            {
+              "brand": "WOB",
+              "model": "zen65",
+              "raw": "WOB zen65"
+            },
+            {
+              "brand": "leobog",
+              "model": "amg65",
+              "raw": "leobog amg65"
+            }
+          ]
+        },
+        {
+          "name": "68 配列",
+          "prototype": "P08",
+          "models": [
+            {
+              "brand": "MelGeek",
+              "model": "MADE68 V2 ULTRA",
+              "raw": "MelGeek MADE68 V2 ULTRA"
+            },
+            {
+              "brand": "MelGeek",
+              "model": "MADE68Ultra",
+              "raw": "MelGeek MADE68Ultra"
+            },
+            {
+              "brand": "PMO",
+              "model": "神临 Gl68",
+              "raw": "PMO 神临 Gl68"
+            },
+            {
+              "brand": "PMO",
+              "model": "神罚 GP68",
+              "raw": "PMO 神罚 GP68"
+            },
+            {
+              "brand": "POM",
+              "model": "GL68 神临",
+              "raw": "POM GL68 神临"
+            },
+            {
+              "brand": "蜜氪",
+              "model": "MADE 68 Ultra V2",
+              "raw": "蜜氪 MADE 68 Ultra V2"
+            },
+            {
+              "brand": "迈从",
+              "model": "ACE68 V2",
+              "raw": "迈从 ACE68 V2"
+            },
+            {
+              "brand": "迈从",
+              "model": "Ace 68 超竞版",
+              "raw": "迈从 Ace 68 超竞版"
+            }
+          ]
+        },
+        {
+          "name": "75 配列",
+          "prototype": "P08",
+          "models": [
+            {
+              "brand": "PMO",
+              "model": "Wave75",
+              "raw": "PMO Wave75"
+            },
+            {
+              "brand": "PMO",
+              "model": "p75",
+              "raw": "PMO p75"
+            },
+            {
+              "brand": "WOB",
+              "model": "Rainy75",
+              "raw": "WOB Rainy75"
+            },
+            {
+              "brand": "WOB",
+              "model": "Rainy75RT",
+              "raw": "WOB Rainy75RT"
+            },
+            {
+              "brand": "leobog",
+              "model": "hi 75c pro",
+              "raw": "leobog hi 75c pro"
+            },
+            {
+              "brand": "凌豹",
+              "model": "k75",
+              "raw": "凌豹 k75"
+            },
+            {
+              "brand": "前行者",
+              "model": "X75 Pro",
+              "raw": "前行者 X75 Pro"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "F75 Max",
+              "raw": "狼蛛 F75 Max"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "nova75",
+              "raw": "狼蛛 nova75"
+            },
+            {
+              "brand": "狼途",
+              "model": "LT75pro",
+              "raw": "狼途 LT75pro"
+            },
+            {
+              "brand": "狼途",
+              "model": "T75",
+              "raw": "狼途 T75"
+            },
+            {
+              "brand": "迈从",
+              "model": "G75 V2",
+              "raw": "迈从 G75 V2"
+            },
+            {
+              "brand": "重力星球",
+              "model": "破茧 75 K1",
+              "raw": "重力星球 破茧 75 K1"
+            }
+          ]
+        },
+        {
+          "name": "80 配列",
+          "prototype": "P08",
+          "models": [
+            {
+              "brand": "PMO",
+              "model": "极光80",
+              "raw": "PMO 极光80"
+            },
+            {
+              "brand": "POM",
+              "model": "AURORA80-极光80特别版",
+              "raw": "POM AURORA80-极光80特别版"
+            },
+            {
+              "brand": "WOB",
+              "model": "Crush80",
+              "raw": "WOB Crush80"
+            }
+          ]
+        },
+        {
+          "name": "84 配列",
+          "prototype": "P08",
+          "models": [
+            {
+              "brand": "狼途",
+              "model": "LT84有线版",
+              "raw": "狼途 LT84有线版"
+            }
+          ]
+        },
+        {
+          "name": "87 配列",
+          "prototype": "P08",
+          "models": [
+            {
+              "brand": "ATK",
+              "model": "A87 Pro",
+              "raw": "ATK A87 Pro"
+            },
+            {
+              "brand": "Skn",
+              "model": "青龙87",
+              "raw": "Skn 青龙87"
+            },
+            {
+              "brand": "VGN",
+              "model": "v87 v2",
+              "raw": "VGN v87 v2"
+            },
+            {
+              "brand": "前行着",
+              "model": "X87 Ultra",
+              "raw": "前行着 X87 Ultra"
+            },
+            {
+              "brand": "前行者",
+              "model": "X87 Ultra V2",
+              "raw": "前行者 X87 Ultra V2"
+            },
+            {
+              "brand": "前行者",
+              "model": "x87",
+              "raw": "前行者 x87"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "F87 Pro V2",
+              "raw": "狼蛛 F87 Pro V2"
+            },
+            {
+              "brand": "狼途",
+              "model": "T87",
+              "raw": "狼途 T87"
+            },
+            {
+              "brand": "迈从",
+              "model": "Mix 87",
+              "raw": "迈从 Mix 87"
+            },
+            {
+              "brand": "阿斯盾",
+              "model": "H87",
+              "raw": "阿斯盾 H87"
+            }
+          ]
+        },
+        {
+          "name": "98 配列",
+          "prototype": "P08",
+          "models": [
+            {
+              "brand": "ATK",
+              "model": "a98 pro",
+              "raw": "ATK a98 pro"
+            },
+            {
+              "brand": "凌豹",
+              "model": "K98 Pro",
+              "raw": "凌豹 K98 Pro"
+            },
+            {
+              "brand": "凌豹",
+              "model": "k98",
+              "raw": "凌豹 k98"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "NOVA 98",
+              "raw": "狼蛛 NOVA 98"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "s98",
+              "raw": "狼蛛 s98"
+            },
+            {
+              "brand": "迈从",
+              "model": "G98 v2",
+              "raw": "迈从 G98 v2"
+            }
+          ]
+        },
+        {
+          "name": "108 配列",
+          "prototype": "P08",
+          "models": [
+            {
+              "brand": "狼蛛",
+              "model": "F108 Pro",
+              "raw": "狼蛛 F108 Pro"
+            },
+            {
+              "brand": "首席玩家",
+              "model": "NEO 108",
+              "raw": "首席玩家 NEO 108"
+            }
+          ]
+        },
+        {
+          "name": "磁轴 / HE 键盘",
+          "prototype": "P08",
+          "models": [
+            {
+              "brand": "狼蛛",
+              "model": "HERO 68 XS",
+              "raw": "狼蛛 HERO 68 XS"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "Mini60 He",
+              "raw": "狼蛛 Mini60 He"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "hero68 he",
+              "raw": "狼蛛 hero68 he"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "hero68air",
+              "raw": "狼蛛 hero68air"
+            },
+            {
+              "brand": "虎符电竞",
+              "model": "x构思者 SAMSARA 65HE",
+              "raw": "虎符电竞x构思者 SAMSARA 65HE"
+            }
+          ]
+        },
+        {
+          "name": "其他配列",
+          "prototype": "P08",
+          "models": [
+            {
+              "brand": "AKKO",
+              "model": "5087 V3",
+              "raw": "AKKO 5087 V3"
+            },
+            {
+              "brand": "AKKO",
+              "model": "诡秘之主",
+              "raw": "AKKO诡秘之主"
+            },
+            {
+              "brand": "ATK",
+              "model": "Rs7 Air",
+              "raw": "ATK Rs7 Air"
+            },
+            {
+              "brand": "ATK",
+              "model": "rs6air",
+              "raw": "ATK rs6air"
+            },
+            {
+              "brand": "Riccks",
+              "model": "RS8",
+              "raw": "Riccks RS8"
+            },
+            {
+              "brand": "SKN",
+              "model": "青龙 惊碳 Ultra",
+              "raw": "SKN 青龙 惊碳 Ultra"
+            },
+            {
+              "brand": "skn",
+              "model": "青龙4.0 ultra",
+              "raw": "skn 青龙4.0 ultra"
+            },
+            {
+              "brand": "京东京造",
+              "model": "JZ990 pro",
+              "raw": "京东京造 JZ990 pro"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "F99",
+              "raw": "狼蛛 F99"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "F99 Pro",
+              "raw": "狼蛛 F99 Pro"
+            },
+            {
+              "brand": "狼途",
+              "model": "LT95",
+              "raw": "狼途 LT95"
+            },
+            {
+              "brand": "钛度",
+              "model": "k980棱戟",
+              "raw": "钛度 k980棱戟"
+            },
+            {
+              "brand": "雷神",
+              "model": "Once 81",
+              "raw": "雷神 Once 81"
+            },
+            {
+              "brand": "青龙",
+              "model": "惊碳ultra",
+              "raw": "青龙 惊碳ultra"
+            },
+            {
+              "brand": "高斯",
+              "model": "3104Tpro",
+              "raw": "高斯 3104Tpro"
+            },
+            {
+              "brand": "高斯",
+              "model": "GS3075pro",
+              "raw": "高斯 GS3075pro"
+            },
+            {
+              "brand": "高斯",
+              "model": "GS3108T PRO",
+              "raw": "高斯 GS3108T PRO"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "鼠标",
+      "modelCount": 45,
+      "subcategories": [
+        {
+          "name": "电竞鼠标",
+          "prototype": "P09",
+          "models": [
+            {
+              "brand": "ATK",
+              "model": "蜻蜓A9 PLUS",
+              "raw": "ATK 蜻蜓A9 PLUS"
+            },
+            {
+              "brand": "ATK",
+              "model": "裂空 F1V3",
+              "raw": "ATK 裂空 F1V3"
+            },
+            {
+              "brand": "ATK",
+              "model": "裂空u2 ultimate2.0",
+              "raw": "ATK 裂空u2 ultimate2.0"
+            },
+            {
+              "brand": "MelGeek",
+              "model": "荷鲁斯",
+              "raw": "MelGeek 荷鲁斯"
+            },
+            {
+              "brand": "VGN",
+              "model": "蜻蜓F2Master+",
+              "raw": "VGN 蜻蜓F2Master+"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "SC580 EVO",
+              "raw": "狼蛛 SC580 EVO"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "SC800",
+              "raw": "狼蛛 SC800"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "SC900 V2",
+              "raw": "狼蛛 SC900 V2"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "sc900",
+              "raw": "狼蛛 sc900"
+            },
+            {
+              "brand": "狼途",
+              "model": "M8se",
+              "raw": "狼途 M8se"
+            },
+            {
+              "brand": "英菲克",
+              "model": "IN 10",
+              "raw": "英菲克 IN 10"
+            },
+            {
+              "brand": "蜜氪",
+              "model": "荷鲁斯",
+              "raw": "蜜氪 荷鲁斯"
+            },
+            {
+              "brand": "达摩鲨",
+              "model": "M3V2",
+              "raw": "达摩鲨 M3V2"
+            },
+            {
+              "brand": "迈从",
+              "model": "A7 V3",
+              "raw": "迈从 A7 V3"
+            },
+            {
+              "brand": "迈从",
+              "model": "K7 V2",
+              "raw": "迈从 K7 V2"
+            },
+            {
+              "brand": "重力星球",
+              "model": "破茧",
+              "raw": "重力星球 破茧"
+            },
+            {
+              "brand": "钛度",
+              "model": "TSG609",
+              "raw": "钛度 TSG609"
+            },
+            {
+              "brand": "钛度",
+              "model": "TSG809千机伞",
+              "raw": "钛度 TSG809千机伞"
+            },
+            {
+              "brand": "钛度",
+              "model": "千机伞2",
+              "raw": "钛度 千机伞2"
+            },
+            {
+              "brand": "阿斯盾",
+              "model": "G06",
+              "raw": "阿斯盾-G06"
+            },
+            {
+              "brand": "雷柏",
+              "model": "vt7",
+              "raw": "雷柏 vt7"
+            },
+            {
+              "brand": "雷神",
+              "model": "G7",
+              "raw": "雷神 G7"
+            },
+            {
+              "brand": "雷神",
+              "model": "MLX",
+              "raw": "雷神 MLX"
+            },
+            {
+              "brand": "高斯",
+              "model": "FLX7",
+              "raw": "高斯 FLX7"
+            }
+          ]
+        },
+        {
+          "name": "小手 / Mini 款",
+          "prototype": "P09",
+          "models": [
+            {
+              "brand": "ATK",
+              "model": "裂空 u2 mini2.0",
+              "raw": "ATK 裂空 u2 mini2.0"
+            },
+            {
+              "brand": "雷神",
+              "model": "ML9 mini",
+              "raw": "雷神 ML9 mini"
+            }
+          ]
+        },
+        {
+          "name": "旗舰电竞款",
+          "prototype": "P09",
+          "models": [
+            {
+              "brand": "凌豹",
+              "model": "M9pro max",
+              "raw": "凌豹 M9pro max"
+            },
+            {
+              "brand": "前行者",
+              "model": "S9 Ultra",
+              "raw": "前行者 S9 Ultra"
+            },
+            {
+              "brand": "机械师",
+              "model": "G7 Pro Max",
+              "raw": "机械师G7 Pro Max"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "SC800 MAX",
+              "raw": "狼蛛 SC800 MAX"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "SC900 Max",
+              "raw": "狼蛛 SC900 Max"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "SC900 Pro",
+              "raw": "狼蛛 SC900 Pro"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "V9 Ultra",
+              "raw": "狼蛛-V9 Ultra"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "x9pro",
+              "raw": "狼蛛 x9pro"
+            },
+            {
+              "brand": "狼途",
+              "model": "M8 MAX",
+              "raw": "狼途 M8 MAX"
+            },
+            {
+              "brand": "迈从",
+              "model": "A7V2 Ultra＋",
+              "raw": "迈从 A7V2 Ultra＋"
+            },
+            {
+              "brand": "迈从",
+              "model": "k7 ultra",
+              "raw": "迈从 k7 ultra"
+            },
+            {
+              "brand": "阿斯盾",
+              "model": "g03 pro",
+              "raw": "阿斯盾g03 pro"
+            },
+            {
+              "brand": "雷柏",
+              "model": "VT0 Max",
+              "raw": "雷柏 VT0 Max"
+            },
+            {
+              "brand": "雷柏",
+              "model": "VT1 Max",
+              "raw": "雷柏 VT1 Max"
+            },
+            {
+              "brand": "雷柏",
+              "model": "VT2 MAX",
+              "raw": "雷柏 VT2 MAX"
+            },
+            {
+              "brand": "雷柏",
+              "model": "VT3 MAX",
+              "raw": "雷柏 VT3 MAX"
+            },
+            {
+              "brand": "雷神",
+              "model": "ML6PRO 竞技版",
+              "raw": "雷神 ML6PRO 竞技版"
+            },
+            {
+              "brand": "雷神",
+              "model": "X7s Pro Max",
+              "raw": "雷神 X7s Pro Max"
+            },
+            {
+              "brand": "高斯",
+              "model": "FLX7 PRO",
+              "raw": "高斯 FLX7 PRO"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "鼠标垫",
+      "modelCount": 30,
+      "subcategories": [
+        {
+          "name": "鼠标垫",
+          "prototype": "P10",
+          "models": [
+            {
+              "brand": "",
+              "model": "京东京造",
+              "raw": "京东京造"
+            },
+            {
+              "brand": "",
+              "model": "炫彩喵",
+              "raw": "炫彩喵"
+            },
+            {
+              "brand": "",
+              "model": "雷硕",
+              "raw": "雷硕"
+            },
+            {
+              "brand": "QCK",
+              "model": "heavy",
+              "raw": "QCK heavy"
+            },
+            {
+              "brand": "WALLHACK",
+              "model": "沃哈克 CR-005",
+              "raw": "WALLHACK沃哈克 CR-005"
+            },
+            {
+              "brand": "剑匠",
+              "model": "zero",
+              "raw": "剑匠 zero"
+            },
+            {
+              "brand": "卓威",
+              "model": "GSRSE 炽Ⅱ",
+              "raw": "卓威 GSRSE 炽Ⅱ"
+            },
+            {
+              "brand": "大寒",
+              "model": "红羽三代",
+              "raw": "大寒 红羽三代"
+            },
+            {
+              "brand": "泰坦过度",
+              "model": "无极",
+              "raw": "泰坦过度 无极"
+            },
+            {
+              "brand": "炫彩喵",
+              "model": "喵垫 2.0",
+              "raw": "炫彩喵 喵垫 2.0"
+            },
+            {
+              "brand": "罗技",
+              "model": "G640",
+              "raw": "罗技 G640"
+            },
+            {
+              "brand": "虎符",
+              "model": "先锋·压胜V2",
+              "raw": "虎符 先锋·压胜V2"
+            },
+            {
+              "brand": "虎符",
+              "model": "先锋·唐刀",
+              "raw": "虎符 先锋·唐刀"
+            },
+            {
+              "brand": "虎符",
+              "model": "青髓3 SP",
+              "raw": "虎符 青髓3 SP"
+            },
+            {
+              "brand": "虎符电竞",
+              "model": "Uni 云云 （猪妹联名款）",
+              "raw": "虎符电竞 Uni 云云 （猪妹联名款）"
+            },
+            {
+              "brand": "虎符电竞",
+              "model": "Uni 粉皮小猪的怪兽眼睛 （蓝）",
+              "raw": "虎符电竞 Uni 粉皮小猪的怪兽眼睛 （蓝）"
+            },
+            {
+              "brand": "虎符电竞",
+              "model": "先锋 昆仑",
+              "raw": "虎符电竞 先锋 昆仑"
+            },
+            {
+              "brand": "虎符电竞",
+              "model": "先锋 穿云",
+              "raw": "虎符电竞 先锋 穿云"
+            },
+            {
+              "brand": "虎符电竞",
+              "model": "压胜 V2",
+              "raw": "虎符电竞 压胜 V2"
+            },
+            {
+              "brand": "虎符电竞",
+              "model": "山海V2 压胜",
+              "raw": "虎符电竞 山海V2 压胜"
+            },
+            {
+              "brand": "虎符电竞",
+              "model": "无相X V2",
+              "raw": "虎符电竞 无相X V2"
+            },
+            {
+              "brand": "虎符电竞",
+              "model": "重爪（缝边版）",
+              "raw": "虎符电竞 重爪（缝边版）"
+            },
+            {
+              "brand": "赛蝰",
+              "model": "剑姬",
+              "raw": "赛蝰 剑姬"
+            },
+            {
+              "brand": "重力星球",
+              "model": "幻姬",
+              "raw": "重力星球 幻姬"
+            },
+            {
+              "brand": "钛度",
+              "model": "钛系列",
+              "raw": "钛度 钛系列"
+            },
+            {
+              "brand": "雷硕",
+              "model": "R085",
+              "raw": "雷硕 R085"
+            },
+            {
+              "brand": "雷硕",
+              "model": "R120",
+              "raw": "雷硕 R120"
+            },
+            {
+              "brand": "雷蛇",
+              "model": "重装甲虫v3",
+              "raw": "雷蛇 重装甲虫v3"
+            },
+            {
+              "brand": "黑著",
+              "model": "女武神",
+              "raw": "黑著 女武神"
+            },
+            {
+              "brand": "黑著",
+              "model": "极润",
+              "raw": "黑著 极润"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "显示器",
+      "modelCount": 15,
+      "subcategories": [
+        {
+          "name": "27 寸 2K",
+          "prototype": "P12",
+          "models": [
+            {
+              "brand": "AOC",
+              "model": "Q27G4SLMWS",
+              "raw": "AOC Q27G4SLMWS"
+            },
+            {
+              "brand": "创维",
+              "model": "F27G30Q Pro",
+              "raw": "创维F27G30Q Pro"
+            },
+            {
+              "brand": "泰坦军团",
+              "model": "P275MS PLUS",
+              "raw": "泰坦军团 P275MS PLUS"
+            },
+            {
+              "brand": "泰坦军团",
+              "model": "P275MV MAX",
+              "raw": "泰坦军团 P275MV MAX"
+            },
+            {
+              "brand": "泰坦军团",
+              "model": "P275MV PLUS增强版",
+              "raw": "泰坦军团 P275MV PLUS增强版"
+            },
+            {
+              "brand": "泰坦军团",
+              "model": "P276MV Ultra",
+              "raw": "泰坦军团P276MV Ultra"
+            }
+          ]
+        },
+        {
+          "name": "24/25 寸高刷",
+          "prototype": "P12",
+          "models": [
+            {
+              "brand": "KTC",
+              "model": "大师25M5",
+              "raw": "KTC 大师25M5"
+            },
+            {
+              "brand": "创维",
+              "model": "F24G52Q Pro",
+              "raw": "创维F24G52Q Pro"
+            },
+            {
+              "brand": "川升",
+              "model": "CS25A",
+              "raw": "川升CS25A"
+            },
+            {
+              "brand": "泰坦军团",
+              "model": "P245MS PRO+",
+              "raw": "泰坦军团 P245MS PRO+"
+            }
+          ]
+        },
+        {
+          "name": "34 寸带鱼屏",
+          "prototype": "P12",
+          "models": [
+            {
+              "brand": "泰坦军团",
+              "model": "M34E7S",
+              "raw": "泰坦军团 M34E7S"
+            },
+            {
+              "brand": "雷鸟",
+              "model": "34U8A Pro",
+              "raw": "雷鸟 34U8A Pro"
+            }
+          ]
+        },
+        {
+          "name": "32 寸 4K",
+          "prototype": "P12",
+          "models": [
+            {
+              "brand": "泰坦军团",
+              "model": "P326MV MAX",
+              "raw": "泰坦军团P326MV MAX"
+            },
+            {
+              "brand": "泰坦军团",
+              "model": "P326MV Ultra",
+              "raw": "泰坦军团P326MV Ultra"
+            },
+            {
+              "brand": "雷鸟",
+              "model": "32U8A Pro-S",
+              "raw": "雷鸟 32U8A Pro-S"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "显示器支架",
+      "modelCount": 7,
+      "subcategories": [
+        {
+          "name": "气压臂支架",
+          "prototype": "P13",
+          "models": [
+            {
+              "brand": "AOC",
+              "model": "AM400PLUS",
+              "raw": "AOC AM400PLUS"
+            },
+            {
+              "brand": "北弧",
+              "model": "E700",
+              "raw": "北弧 E700"
+            },
+            {
+              "brand": "北弧",
+              "model": "e350",
+              "raw": "北弧 e350"
+            },
+            {
+              "brand": "北弧",
+              "model": "e350ez-2 双臂",
+              "raw": "北弧 e350ez-2 双臂"
+            },
+            {
+              "brand": "北弧",
+              "model": "e500PD",
+              "raw": "北弧 e500PD"
+            },
+            {
+              "brand": "友狮",
+              "model": "CX09",
+              "raw": "友狮 CX09"
+            },
+            {
+              "brand": "松能",
+              "model": "T690-2",
+              "raw": "松能 T690-2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "投影仪",
+      "modelCount": 12,
+      "subcategories": [
+        {
+          "name": "投影仪",
+          "prototype": "P14",
+          "models": [
+            {
+              "brand": "Vidda",
+              "model": "C3 Pro高亮版",
+              "raw": "Vidda C3 Pro高亮版"
+            },
+            {
+              "brand": "Vidda",
+              "model": "C3s 高亮版",
+              "raw": "Vidda C3s 高亮版"
+            },
+            {
+              "brand": "Vidda",
+              "model": "大眼睛M2 Pro",
+              "raw": "Vidda 大眼睛M2 Pro"
+            },
+            {
+              "brand": "坚果",
+              "model": "N5s Pro",
+              "raw": "坚果 N5s Pro"
+            },
+            {
+              "brand": "坚果",
+              "model": "n1s",
+              "raw": "坚果n1s"
+            },
+            {
+              "brand": "大眼橙",
+              "model": "C3 Air",
+              "raw": "大眼橙C3 Air"
+            },
+            {
+              "brand": "大眼橙",
+              "model": "C3 Ultra",
+              "raw": "大眼橙 C3 Ultra"
+            },
+            {
+              "brand": "小明",
+              "model": "Q6 neo",
+              "raw": "小明Q6 neo"
+            },
+            {
+              "brand": "当贝",
+              "model": "D7X Pro",
+              "raw": "当贝 D7X Pro"
+            },
+            {
+              "brand": "极米",
+              "model": "RS 20 Plus高亮版",
+              "raw": "极米RS 20 Plus高亮版"
+            },
+            {
+              "brand": "极米",
+              "model": "Z6X Pro",
+              "raw": "极米Z6X Pro"
+            },
+            {
+              "brand": "极米",
+              "model": "z9X",
+              "raw": "极米z9X"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "音响素材",
+      "modelCount": 3,
+      "subcategories": [
+        {
+          "name": "音响",
+          "prototype": "P16",
+          "models": [
+            {
+              "brand": "IKF",
+              "model": "A30幻影",
+              "raw": "IKF A30幻影"
+            },
+            {
+              "brand": "狼蛛",
+              "model": "GS6",
+              "raw": "狼蛛 GS6"
+            },
+            {
+              "brand": "重力星球",
+              "model": "G1PRO",
+              "raw": "重力星球 G1PRO"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "人体工学椅",
+      "modelCount": 33,
+      "subcategories": [
+        {
+          "name": "人体工学椅",
+          "prototype": "P11",
+          "models": [
+            {
+              "brand": "ENOVA",
+              "model": "乐享派lite",
+              "raw": "ENOVA 乐享派lite"
+            },
+            {
+              "brand": "ENOVA",
+              "model": "智慧家plus",
+              "raw": "ENOVA 智慧家plus"
+            },
+            {
+              "brand": "ENOVA",
+              "model": "自由家",
+              "raw": "ENOVA自由家"
+            },
+            {
+              "brand": "TOAI",
+              "model": "战术大师",
+              "raw": "TOAI 战术大师"
+            },
+            {
+              "brand": "TOAI",
+              "model": "战术大师 Pro",
+              "raw": "TOAI 战术大师 Pro"
+            },
+            {
+              "brand": "京东京造",
+              "model": "Z5 pro",
+              "raw": "京东京造 Z5 pro"
+            },
+            {
+              "brand": "京东京造",
+              "model": "Z5 ultra",
+              "raw": "京东京造 Z5 ultra"
+            },
+            {
+              "brand": "京东京造",
+              "model": "Z9 Pro",
+              "raw": "京东京造 Z9 Pro"
+            },
+            {
+              "brand": "京东京造",
+              "model": "Z9 Ultra 二代",
+              "raw": "京东京造 Z9 Ultra 二代"
+            },
+            {
+              "brand": "京东京造",
+              "model": "Z9Ultra 2代",
+              "raw": "京东京造 Z9Ultra 2代"
+            },
+            {
+              "brand": "京东京造",
+              "model": "z5 soft",
+              "raw": "京东京造z5 soft"
+            },
+            {
+              "brand": "京东京造",
+              "model": "z9 pro 1代",
+              "raw": "京东京造 z9 pro 1代"
+            },
+            {
+              "brand": "京东京造",
+              "model": "z9 ultra",
+              "raw": "京东京造z9 ultra"
+            },
+            {
+              "brand": "保友",
+              "model": "Pofit 二代",
+              "raw": "保友 Pofit 二代"
+            },
+            {
+              "brand": "保友",
+              "model": "pofit2",
+              "raw": "保友 pofit2"
+            },
+            {
+              "brand": "保友",
+              "model": "金豪 E2 Pro",
+              "raw": "保友金豪 E2 Pro"
+            },
+            {
+              "brand": "恒林",
+              "model": "L700",
+              "raw": "恒林 L700"
+            },
+            {
+              "brand": "恒林",
+              "model": "逆袭者",
+              "raw": "恒林逆袭者"
+            },
+            {
+              "brand": "恒林",
+              "model": "逆袭者 2代",
+              "raw": "恒林逆袭者 2代"
+            },
+            {
+              "brand": "歌德利",
+              "model": "C12",
+              "raw": "歌德利 C12"
+            },
+            {
+              "brand": "歌德利",
+              "model": "C15",
+              "raw": "歌德利 C15"
+            },
+            {
+              "brand": "歌德利",
+              "model": "G22",
+              "raw": "歌德利 G22"
+            },
+            {
+              "brand": "歌德利",
+              "model": "J2",
+              "raw": "歌德利J2"
+            },
+            {
+              "brand": "歌德利",
+              "model": "Q7",
+              "raw": "歌德利 Q7"
+            },
+            {
+              "brand": "西昊",
+              "model": "B300",
+              "raw": "西昊 B300"
+            },
+            {
+              "brand": "骁骑",
+              "model": "X5 Proi",
+              "raw": "骁骑 X5 Proi"
+            },
+            {
+              "brand": "黑白调",
+              "model": "E3 Pro 四代",
+              "raw": "黑白调 E3 Pro 四代"
+            },
+            {
+              "brand": "黑白调",
+              "model": "E3 Ultra 五代",
+              "raw": "黑白调 E3 Ultra 五代"
+            },
+            {
+              "brand": "黑白调",
+              "model": "P2 Pro",
+              "raw": "黑白调 P2 Pro"
+            },
+            {
+              "brand": "黑白调",
+              "model": "P2 Ultra",
+              "raw": "黑白调 P2 Ultra"
+            },
+            {
+              "brand": "黑白调",
+              "model": "P2 pro 2代",
+              "raw": "黑白调 P2 pro 2代"
+            },
+            {
+              "brand": "黑白调",
+              "model": "T8 Max",
+              "raw": "黑白调 T8 Max"
+            }
+          ]
+        },
+        {
+          "name": "电竞椅",
+          "prototype": "P11",
+          "models": [
+            {
+              "brand": "京东京造",
+              "model": "GX3 电竞椅",
+              "raw": "京东京造 GX3 电竞椅"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "充电宝",
+      "modelCount": 23,
+      "subcategories": [
+        {
+          "name": "大容量充电宝",
+          "prototype": "P17",
+          "models": [
+            {
+              "brand": "DOKIY",
+              "model": "C04",
+              "raw": "DOKIY C04"
+            },
+            {
+              "brand": "京东京造",
+              "model": "55w",
+              "raw": "京东京造55w"
+            },
+            {
+              "brand": "京东京造",
+              "model": "JZ40",
+              "raw": "京东京造JZ40"
+            },
+            {
+              "brand": "京东京造",
+              "model": "能量块pro（55w）",
+              "raw": "京东京造 能量块pro（55w）"
+            },
+            {
+              "brand": "京东京造",
+              "model": "能量怪兽15号",
+              "raw": "京东京造能量怪兽15号"
+            },
+            {
+              "brand": "京东京造",
+              "model": "能量棒",
+              "raw": "京东京造 能量棒"
+            },
+            {
+              "brand": "京东京造",
+              "model": "超级块6号",
+              "raw": "京东京造 超级块6号"
+            },
+            {
+              "brand": "京东京造",
+              "model": "超能大白pro max(55w）",
+              "raw": "京东京造超能大白pro max(55w）"
+            },
+            {
+              "brand": "京东京造",
+              "model": "超能大白pro(45w）",
+              "raw": "京东京造超能大白pro(45w）"
+            },
+            {
+              "brand": "京东京造",
+              "model": "超能大白pro（35w）",
+              "raw": "京东京造 超能大白pro（35w）"
+            },
+            {
+              "brand": "京东京造",
+              "model": "超能大白（30w）",
+              "raw": "京东京造超能大白（30w）"
+            },
+            {
+              "brand": "倍思",
+              "model": "极客充",
+              "raw": "倍思极客充"
+            },
+            {
+              "brand": "台电",
+              "model": "H20 Pro-T",
+              "raw": "台电H20 Pro-T"
+            },
+            {
+              "brand": "安克",
+              "model": "能量舱",
+              "raw": "安克能量舱"
+            },
+            {
+              "brand": "移速",
+              "model": "能量魔方Pro Max",
+              "raw": "移速能量魔方Pro Max"
+            },
+            {
+              "brand": "米物",
+              "model": "M320 Air",
+              "raw": "米物 M320 Air"
+            },
+            {
+              "brand": "西圣",
+              "model": "PB",
+              "raw": "西圣PB"
+            },
+            {
+              "brand": "西圣",
+              "model": "PB Pro",
+              "raw": "西圣PB Pro"
+            },
+            {
+              "brand": "西圣",
+              "model": "PBS",
+              "raw": "西圣 PBS"
+            },
+            {
+              "brand": "西圣",
+              "model": "pb air",
+              "raw": "西圣pb air"
+            },
+            {
+              "brand": "酷态科",
+              "model": "10号Plus超级电能棒",
+              "raw": "酷态科10号Plus超级电能棒"
+            }
+          ]
+        },
+        {
+          "name": "磁吸充电宝",
+          "prototype": "P17",
+          "models": [
+            {
+              "brand": "倍思",
+              "model": "卡片磁吸air",
+              "raw": "倍思 卡片磁吸air"
+            },
+            {
+              "brand": "倍思",
+              "model": "卡片磁吸充电宝",
+              "raw": "倍思卡片磁吸充电宝"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "充电头",
+      "modelCount": 3,
+      "subcategories": [
+        {
+          "name": "氮化镓充电器",
+          "prototype": "P18",
+          "models": [
+            {
+              "brand": "京选",
+              "model": "氮化镓充电器套装 100W",
+              "raw": "京选 氮化镓充电器套装 100W"
+            },
+            {
+              "brand": "传应南孚",
+              "model": "100W",
+              "raw": "传应南孚 100W"
+            },
+            {
+              "brand": "图拉斯",
+              "model": "100W 小冰充",
+              "raw": "图拉斯 100W 小冰充"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "手机散热器",
+      "modelCount": 7,
+      "subcategories": [
+        {
+          "name": "手机散热器",
+          "prototype": "P19",
+          "models": [
+            {
+              "brand": "",
+              "model": "绿联",
+              "raw": "绿联"
+            },
+            {
+              "brand": "1加",
+              "model": "磁吸冰卡",
+              "raw": "1加 磁吸冰卡"
+            },
+            {
+              "brand": "IQOO",
+              "model": "散热背夹3Neo",
+              "raw": "IQOO 散热背夹3Neo"
+            },
+            {
+              "brand": "努比亚",
+              "model": "红魔散热器8 Air",
+              "raw": "努比亚 红魔散热器8 Air"
+            },
+            {
+              "brand": "努比亚",
+              "model": "红魔散热器8 Pro",
+              "raw": "努比亚 红魔散热器8 Pro"
+            },
+            {
+              "brand": "飞智",
+              "model": "B9磁吸",
+              "raw": "飞智B9磁吸"
+            },
+            {
+              "brand": "黑鲨",
+              "model": "6Pro磁吸",
+              "raw": "黑鲨 6Pro磁吸"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "游戏手柄",
+      "modelCount": 19,
+      "subcategories": [
+        {
+          "name": "无线手柄",
+          "prototype": "P20",
+          "models": [
+            {
+              "brand": "乌龟海岸",
+              "model": "战旗酷玩版",
+              "raw": "乌龟海岸 战旗酷玩版"
+            },
+            {
+              "brand": "八位堂",
+              "model": "猎户座2",
+              "raw": "八位堂 猎户座2"
+            },
+            {
+              "brand": "北通",
+              "model": "鲲鹏 20绝尘白",
+              "raw": "北通鲲鹏 20绝尘白"
+            },
+            {
+              "brand": "北通",
+              "model": "鲲鹏50二代",
+              "raw": "北通鲲鹏50二代"
+            },
+            {
+              "brand": "北通",
+              "model": "鲲鹏70",
+              "raw": "北通鲲鹏70"
+            },
+            {
+              "brand": "澳加狮",
+              "model": "K30",
+              "raw": "澳加狮 K30"
+            },
+            {
+              "brand": "澳加狮",
+              "model": "N10",
+              "raw": "澳加狮 N10"
+            },
+            {
+              "brand": "澳加狮",
+              "model": "k20",
+              "raw": "澳加狮 k20"
+            },
+            {
+              "brand": "澳加狮",
+              "model": "大圣3",
+              "raw": "澳加狮 大圣3"
+            },
+            {
+              "brand": "炽壳",
+              "model": "魔术师",
+              "raw": "炽壳 魔术师"
+            },
+            {
+              "brand": "盖世小鸡",
+              "model": "G7pro",
+              "raw": "盖世小鸡G7pro"
+            },
+            {
+              "brand": "盖世小鸡",
+              "model": "启明星2",
+              "raw": "盖世小鸡 启明星2"
+            },
+            {
+              "brand": "盖世小鸡",
+              "model": "天王星 8k",
+              "raw": "盖世小鸡 天王星 8k"
+            },
+            {
+              "brand": "致动",
+              "model": "超级传奇",
+              "raw": "致动 超级传奇"
+            },
+            {
+              "brand": "西圣",
+              "model": "GC1",
+              "raw": "西圣 GC1"
+            },
+            {
+              "brand": "雷神",
+              "model": "G30s",
+              "raw": "雷神 G30s"
+            },
+            {
+              "brand": "雷神",
+              "model": "G80雷切",
+              "raw": "雷神 G80雷切"
+            },
+            {
+              "brand": "飞智",
+              "model": "八爪鱼5",
+              "raw": "飞智八爪鱼5"
+            },
+            {
+              "brand": "飞智",
+              "model": "冰原狼4",
+              "raw": "飞智 冰原狼4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "硬盘",
+      "modelCount": 2,
+      "subcategories": [
+        {
+          "name": "硬盘",
+          "prototype": "P21",
+          "models": [
+            {
+              "brand": "京东京造",
+              "model": "朱雀",
+              "raw": "京东京造 朱雀"
+            },
+            {
+              "brand": "芯联创",
+              "model": "小方块",
+              "raw": "芯联创 小方块"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "扫地机",
+      "modelCount": 9,
+      "subcategories": [
+        {
+          "name": "扫地机器人",
+          "prototype": "P24",
+          "models": [
+            {
+              "brand": "云鲸",
+              "model": "逍遥002 Max",
+              "raw": "云鲸 逍遥002 Max"
+            },
+            {
+              "brand": "大疆",
+              "model": "ROMO P",
+              "raw": "大疆 ROMO P"
+            },
+            {
+              "brand": "大疆",
+              "model": "ROMO P 透明旗舰版",
+              "raw": "大疆 ROMO P 透明旗舰版"
+            },
+            {
+              "brand": "石头",
+              "model": "P20 Ultra Plus",
+              "raw": "石头 P20 Ultra Plus"
+            },
+            {
+              "brand": "科沃斯",
+              "model": "T80S",
+              "raw": "科沃斯 T80S"
+            },
+            {
+              "brand": "科沃斯",
+              "model": "X11 PRO",
+              "raw": "科沃斯 X11 PRO"
+            },
+            {
+              "brand": "追觅",
+              "model": "S50 Pro",
+              "raw": "追觅 S50 Pro"
+            },
+            {
+              "brand": "追觅",
+              "model": "S60 Pro",
+              "raw": "追觅 S60 Pro"
+            },
+            {
+              "brand": "追觅",
+              "model": "X50 Pro 增强版",
+              "raw": "追觅 X50 Pro 增强版"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "电动牙刷",
+      "modelCount": 6,
+      "subcategories": [
+        {
+          "name": "电动牙刷",
+          "prototype": "P28",
+          "models": [
+            {
+              "brand": "Flonx",
+              "model": "Max",
+              "raw": "Flonx-Max"
+            },
+            {
+              "brand": "同诗",
+              "model": "U2Pro",
+              "raw": "同诗-U2Pro"
+            },
+            {
+              "brand": "徕芬",
+              "model": "i2 ABS",
+              "raw": "徕芬-i2 ABS"
+            },
+            {
+              "brand": "扉乐",
+              "model": "MAJOR",
+              "raw": "扉乐-MAJOR"
+            },
+            {
+              "brand": "笑容加",
+              "model": "P20 PRO",
+              "raw": "笑容加-P20 PRO"
+            },
+            {
+              "brand": "飞科",
+              "model": "FT7105",
+              "raw": "飞科-FT7105"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "刮胡刀",
+      "modelCount": 14,
+      "subcategories": [
+        {
+          "name": "刮胡刀",
+          "prototype": "P29",
+          "models": [
+            {
+              "brand": "FESX",
+              "model": "AXE",
+              "raw": "FESX-AXE"
+            },
+            {
+              "brand": "京东京造",
+              "model": "P5",
+              "raw": "京东京造 P5"
+            },
+            {
+              "brand": "京东京造",
+              "model": "P5 metal",
+              "raw": "京东京造-P5 metal"
+            },
+            {
+              "brand": "京东京造",
+              "model": "S7",
+              "raw": "京东京造-S7"
+            },
+            {
+              "brand": "京东京造",
+              "model": "X5",
+              "raw": "京东京造 X5"
+            },
+            {
+              "brand": "同诗",
+              "model": "艾齐S9",
+              "raw": "同诗 艾齐S9"
+            },
+            {
+              "brand": "奔腾",
+              "model": "小星锤",
+              "raw": "奔腾 小星锤"
+            },
+            {
+              "brand": "小适",
+              "model": "F305",
+              "raw": "小适 F305"
+            },
+            {
+              "brand": "有色",
+              "model": "MINI 2.0标准",
+              "raw": "有色 MINI 2.0标准"
+            },
+            {
+              "brand": "有色",
+              "model": "MINI 5",
+              "raw": "有色 MINI 5"
+            },
+            {
+              "brand": "未野",
+              "model": "MAX",
+              "raw": "未野-MAX"
+            },
+            {
+              "brand": "西屋",
+              "model": "G50",
+              "raw": "西屋 G50"
+            },
+            {
+              "brand": "飞利浦",
+              "model": "旋风3系pro",
+              "raw": "飞利浦 旋风3系pro"
+            },
+            {
+              "brand": "飞利浦",
+              "model": "鹅卵石pro",
+              "raw": "飞利浦 鹅卵石pro"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "血压计",
+      "modelCount": 5,
+      "subcategories": [
+        {
+          "name": "血压计",
+          "prototype": "P30",
+          "models": [
+            {
+              "brand": "OMRON",
+              "model": "欧姆龙-J710",
+              "raw": "OMRON欧姆龙-J710"
+            },
+            {
+              "brand": "OMRON",
+              "model": "欧姆龙-J760",
+              "raw": "OMRON欧姆龙-J760"
+            },
+            {
+              "brand": "Panasonic",
+              "model": "EW-BU18W011",
+              "raw": "Panasonic-EW-BU18W011"
+            },
+            {
+              "brand": "yuwell",
+              "model": "鱼跃-YE8800AR",
+              "raw": "yuwell鱼跃-YE8800AR"
+            },
+            {
+              "brand": "町石",
+              "model": "tinx-U80S",
+              "raw": "町石tinx-U80S"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "助听器",
+      "modelCount": 5,
+      "subcategories": [
+        {
+          "name": "助听器",
+          "prototype": "P31",
+          "models": [
+            {
+              "brand": "",
+              "model": "光大夫",
+              "raw": "光大夫"
+            },
+            {
+              "brand": "",
+              "model": "创维",
+              "raw": "创维"
+            },
+            {
+              "brand": "",
+              "model": "未来客",
+              "raw": "未来客"
+            },
+            {
+              "brand": "",
+              "model": "科大讯飞",
+              "raw": "科大讯飞"
+            },
+            {
+              "brand": "町石",
+              "model": "TC1600-N12",
+              "raw": "町石-TC1600-N12"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "按摩仪素材",
+      "modelCount": 4,
+      "subcategories": [
+        {
+          "name": "按摩仪",
+          "prototype": "P32",
+          "models": [
+            {
+              "brand": "",
+              "model": "司库崎",
+              "raw": "司库崎"
+            },
+            {
+              "brand": "",
+              "model": "妙界",
+              "raw": "妙界"
+            },
+            {
+              "brand": "",
+              "model": "未野",
+              "raw": "未野"
+            },
+            {
+              "brand": "倍轻松",
+              "model": "mini60",
+              "raw": "倍轻松mini60"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "行李箱",
+      "modelCount": 9,
+      "subcategories": [
+        {
+          "name": "行李箱",
+          "prototype": "P36",
+          "models": [
+            {
+              "brand": "90分",
+              "model": "行 莱茵河Pro",
+              "raw": "90分行 莱茵河Pro"
+            },
+            {
+              "brand": "Diplomat",
+              "model": "外交官",
+              "raw": "Diplomat外交官"
+            },
+            {
+              "brand": "京东京造",
+              "model": "无界铝框",
+              "raw": "京东京造无界铝框"
+            },
+            {
+              "brand": "京东京造",
+              "model": "无际",
+              "raw": "京东京造无际"
+            },
+            {
+              "brand": "京东京造",
+              "model": "飞行家",
+              "raw": "京东京造 飞行家"
+            },
+            {
+              "brand": "地平线",
+              "model": "8号",
+              "raw": "地平线8号"
+            },
+            {
+              "brand": "森马",
+              "model": "普通行李箱",
+              "raw": "森马普通行李箱"
+            },
+            {
+              "brand": "爱华仕",
+              "model": "行李箱",
+              "raw": "爱华仕行李箱"
+            },
+            {
+              "brand": "米家",
+              "model": "小米行李箱",
+              "raw": "米家小米行李箱"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "衣服",
+      "modelCount": 3,
+      "subcategories": [
+        {
+          "name": "衣服",
+          "prototype": "P37",
+          "models": [
+            {
+              "brand": "",
+              "model": "0625_夏装",
+              "raw": "0625_夏装"
+            },
+            {
+              "brand": "",
+              "model": "棉服",
+              "raw": "棉服"
+            },
+            {
+              "brand": "",
+              "model": "羽绒服产品",
+              "raw": "羽绒服产品"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "杯",
+      "modelCount": 2,
+      "subcategories": [
+        {
+          "name": "杯",
+          "prototype": "P38",
+          "models": [
+            {
+              "brand": "",
+              "model": "梦幻精灵",
+              "raw": "梦幻精灵"
+            },
+            {
+              "brand": "",
+              "model": "约束三代",
+              "raw": "约束三代"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "吸尘器-洗地机",
+      "modelCount": 0,
+      "subcategories": [
+        {
+          "name": "（无具体型号）",
+          "prototype": "P25",
+          "models": []
+        }
+      ]
+    },
+    {
+      "name": "升降桌",
+      "modelCount": 0,
+      "subcategories": [
+        {
+          "name": "（无具体型号）",
+          "prototype": "P35",
+          "models": []
+        }
+      ]
+    },
+    {
+      "name": "路由器",
+      "modelCount": 0,
+      "subcategories": [
+        {
+          "name": "（无具体型号）",
+          "prototype": "P39",
+          "models": []
+        }
+      ]
+    },
+    {
+      "name": "宽带",
+      "modelCount": 0,
+      "subcategories": [
+        {
+          "name": "（无具体型号）",
+          "prototype": "P40",
+          "models": []
+        }
+      ]
+    },
+    {
+      "name": "手机",
+      "modelCount": 0,
+      "subcategories": [
+        {
+          "name": "（无具体型号）",
+          "prototype": "P22",
+          "models": []
+        }
+      ]
+    },
+    {
+      "name": "按摩椅",
+      "modelCount": 0,
+      "subcategories": [
+        {
+          "name": "（无具体型号）",
+          "prototype": "P33",
+          "models": []
+        }
+      ]
+    },
+    {
+      "name": "冰箱",
+      "modelCount": 0,
+      "subcategories": [
+        {
+          "name": "（无具体型号）",
+          "prototype": "P26",
+          "models": []
+        }
+      ]
+    },
+    {
+      "name": "跑步机",
+      "modelCount": 0,
+      "subcategories": [
+        {
+          "name": "（无具体型号）",
+          "prototype": "P34",
+          "models": []
+        }
+      ]
+    },
+    {
+      "name": "空调",
+      "modelCount": 0,
+      "subcategories": [
+        {
+          "name": "（无具体型号）",
+          "prototype": "P27",
+          "models": []
+        }
+      ]
+    },
+    {
+      "name": "电视",
+      "modelCount": 0,
+      "subcategories": [
+        {
+          "name": "（无具体型号）",
+          "prototype": "P15",
+          "models": []
+        }
+      ]
+    },
+    {
+      "name": "平板",
+      "modelCount": 0,
+      "subcategories": [
+        {
+          "name": "（无具体型号）",
+          "prototype": "P23",
+          "models": []
+        }
+      ]
+    }
+  ]
+}
