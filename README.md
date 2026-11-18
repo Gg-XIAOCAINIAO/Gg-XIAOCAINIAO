@@ -266,3 +266,25 @@ python tests/test_api.py
 ```
 
 卡片 280px / 24px 间距 / 12px 圆角 / 24px 内边距；筛选控件 36px 高、8px 圆角；表格行 52px；动效统一 200–240ms `cubic-bezier(.22,.61,.36,1)`，并遵循 `prefers-reduced-motion`。
+
+## Cloudflare 线上版（Functions + D1）
+
+线上地址：<https://gg-xiaocainiao.pages.dev>
+
+线上版把 `server.py` 的业务逻辑移植为 Cloudflare Pages Functions（`functions/`），数据保存在 Cloudflare D1，绑定名 `DB`；`public/` 前端与本地版本完全一致。多个同事打开同一网址即可共同登记借出 / 归还，数据持久保存。
+
+- 首次访问会自动建表并写入演示数据（88 个品类节点、18 件库存、42 条流水、6 位借用人）。
+- 修改 `server.py` 的种子后执行 `python tools/dump_seed.py` 重新生成 `functions/_seed.js`。
+- 线上版暂不支持导入 GLB 模型（`POST /api/models/import` 返回 501），其余功能与本地一致。
+- 本地回归：`node tools/test_api_local.mjs`；与 Python 版逐字段对比：`node tools/parity_check.mjs --py http://127.0.0.1:18081 --js http://127.0.0.1:18082`。
+
+### 部署说明
+
+仓库推送到 GitHub 后，Cloudflare Pages 会自动构建发布：
+
+- 构建命令：`npm run build`（占位命令，前端无需构建）
+- 构建输出目录：`public`
+- D1 绑定：变量名 `DB`、数据库名 `echo-rental`，见 `wrangler.toml`
+
+> 安全提示：当前线上版没有登录校验，拿到网址的人都可以修改数据；建议只在公司内部传播，后续可加简单口令或 Cloudflare Access。
+

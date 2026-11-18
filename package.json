@@ -1,0 +1,10 @@
+{
+  "name": "echo-rental",
+  "private": true,
+  "description": "回声科技 · 产品借用（本地 Python 服务 + Cloudflare Pages Functions/D1 线上版）",
+  "scripts": {
+    "build": "node -e \"console.log('static assets ready')\"",
+    "test": "node tools/test_api_local.mjs",
+    "parity": "node tools/parity_check.mjs"
+  }
+}

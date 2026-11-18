@@ -1,0 +1,8 @@
+name = "gg-xiaocainiao"
+compatibility_date = "2026-01-01"
+pages_build_output_dir = "./public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "echo-rental"
+database_id = "93cfe913-0832-48db-bbed-d9b2da6f682a"
