@@ -8,6 +8,7 @@
     "test": "node tools/test_api_local.mjs",
     "parity": "node tools/parity_check.mjs",
     "test:auth": "node tools/test_auth_local.mjs",
-    "test:auth-api": "node tools/test_auth_api_local.mjs"
+    "test:auth-api": "node tools/test_auth_api_local.mjs",
+    "test:imports": "node tools/test_imports.mjs"
   }
 }

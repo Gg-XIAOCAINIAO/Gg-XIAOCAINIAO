@@ -1,4 +1,4 @@
-import { htmlPage } from "./_pages.js";
+import { htmlPage } from "../_pages.js";
 
 export async function onRequest() {
   const script = `(function(){
