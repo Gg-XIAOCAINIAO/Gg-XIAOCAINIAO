@@ -288,3 +288,16 @@ python tests/test_api.py
 
 > 安全提示：当前线上版没有登录校验，拿到网址的人都可以修改数据；建议只在公司内部传播，后续可加简单口令或 Cloudflare Access。
 
+## 如何更新线上网站
+
+线上网站 = GitHub 仓库 `Gg-XIAOCAINIAO/Gg-XIAOCAINIAO` 的 `main` 分支。每次 `git push` 后 Cloudflare 自动构建发布（约 1 分钟），D1 里的业务数据不会重置。
+
+1. **让 DSH 助手改**：把需求说清楚，改完自动提交推送。
+2. **GitHub 网页小改**：打开仓库 → 编辑 `README.md` 或 `public/` 下的文件 → Commit changes 到 `main`，等 1 分钟后刷新线上地址。
+3. **本机改代码再推送**：仓库在本机的位置是 DSH 工作区里的 `公司租借产品网站` 目录（`D:\工程项目\...` 下的原件不是 git 仓库，改了不会上线）。改完后双击工作区根目录的 `更新网站.cmd`（自动 add/commit/push），或在项目目录执行 `git add -A && git commit -m "说明" && git push`。
+
+- 查看部署：Cloudflare 面板 → Workers 和 Pages → `gg-xiaocainiao` → 部署。
+- 回滚：在部署列表里选上一次成功的版本 → 回滚。
+- 只改页面上的业务数据（新增/归还/删除记录）不需要发布，直接在网站上操作即可。
+
+
