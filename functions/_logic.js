@@ -71,6 +71,9 @@ export const MODEL_KEYS = new Set([
 
 export const FINISH_KEYS = new Set(["default", "oak", "sage", "clay", "graphite"]);
 export const MODEL_SCOPES = new Set(["current", "same_name", "category"]);
+export const DEFAULT_NOTE_PLACEHOLDER =
+  "给器物留个便签吧——可以备注一下用来干啥（办公或自用），最好拍张产品照片上传哦～";
+const MAX_NOTE_IMAGE_BYTES = 1024 * 1024;
 
 const PRODUCT_SELECT = `
     SELECT p.*,
@@ -184,6 +187,145 @@ function normalizeSpaces(value) {
 }
 
 // ---------------------------------------------------------------------------
+// 产品备注与站内文案
+// ---------------------------------------------------------------------------
+
+function cleanNoteText(value) {
+  if (value === undefined || value === null || value === "") return "";
+  if (typeof value !== "string") throw new ApiError(400, "备注文字格式无效");
+  const text = value.replace(/\r\n?/g, "\n").trim();
+  const cleaned = [...text]
+    .filter((character) => character === "\n" || character === "\t" || character.codePointAt(0) >= 32)
+    .join("");
+  if ([...cleaned].length > 500) throw new ApiError(400, "备注文字不能超过 500 个字符");
+  return cleaned;
+}
+
+function decodeNoteImage(value) {
+  if (value === undefined || value === null || value === "") return null;
+  if (typeof value !== "string") throw new ApiError(400, "照片数据格式无效");
+  let encoded = value.trim();
+  let declaredMime = "";
+  const match = encoded.match(/^data:([^;,]+)?(?:;base64)?,(.*)$/s);
+  if (match) {
+    declaredMime = (match[1] || "").toLowerCase();
+    encoded = match[2];
+  }
+  encoded = encoded.replace(/\s+/g, "");
+  if (!encoded) throw new ApiError(400, "照片内容为空");
+  if (encoded.length > MAX_NOTE_IMAGE_BYTES * 2) {
+    throw new ApiError(413, "照片不能超过 1 MB");
+  }
+  let binary;
+  try {
+    binary = atob(encoded);
+  } catch {
+    throw new ApiError(400, "照片数据编码无效");
+  }
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  if (!bytes.length) throw new ApiError(400, "照片内容为空");
+  if (bytes.length > MAX_NOTE_IMAGE_BYTES) throw new ApiError(413, "照片不能超过 1 MB");
+
+  let mime = "";
+  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) mime = "image/jpeg";
+  else if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) mime = "image/png";
+  else if (
+    bytes.length >= 12
+    && String.fromCharCode(bytes[0], bytes[1], bytes[2], bytes[3]) === "RIFF"
+    && String.fromCharCode(bytes[8], bytes[9], bytes[10], bytes[11]) === "WEBP"
+  ) mime = "image/webp";
+  if (!mime) throw new ApiError(400, "照片仅支持 JPG / PNG / WebP");
+  void declaredMime;
+  return { mime, bytes };
+}
+
+async function saveNoteImage(db, raw) {
+  const image = decodeNoteImage(raw);
+  if (!image) return null;
+  const result = await run(
+    db,
+    "INSERT INTO product_note_images (mime, bytes, created_at) VALUES (?, ?, ?)",
+    image.mime,
+    image.bytes,
+    shanghaiDateTime(),
+  );
+  return { id: lastRowId(result), mime: image.mime };
+}
+
+async function parseProductNote(db, payload) {
+  const text = cleanNoteText(payload?.note_text);
+  const image = await saveNoteImage(db, payload?.note_image);
+  let mode = "";
+  if (text && image) mode = "both";
+  else if (text) mode = "text";
+  else if (image) mode = "image";
+  return { mode, text, imageId: image ? image.id : null };
+}
+
+async function deleteNoteImageIfUnused(db, imageId) {
+  if (imageId === null || imageId === undefined) return;
+  const row = await first(
+    db,
+    "SELECT COUNT(*) AS c FROM products WHERE note_image_id = ?",
+    imageId,
+  );
+  if (Number(row ? row.c : 0) > 0) return;
+  await run(db, "DELETE FROM product_note_images WHERE id = ?", imageId);
+}
+
+function toUint8Array(value) {
+  if (value instanceof Uint8Array) return value;
+  if (value instanceof ArrayBuffer) return new Uint8Array(value);
+  if (Array.isArray(value)) return new Uint8Array(value);
+  if (value && value.buffer) {
+    return new Uint8Array(value.buffer, value.byteOffset || 0, value.byteLength || value.buffer.byteLength);
+  }
+  return new Uint8Array();
+}
+
+export async function getNoteImage(db, imageId) {
+  const row = await first(
+    db,
+    "SELECT mime, bytes FROM product_note_images WHERE id = ?",
+    imageId,
+  );
+  if (!row) throw new ApiError(404, "照片不存在");
+  return { mime: row.mime || "image/jpeg", bytes: toUint8Array(row.bytes) };
+}
+
+export async function getNotePlaceholder(db) {
+  const row = await first(
+    db,
+    "SELECT value FROM app_settings WHERE key = 'note_placeholder'",
+  );
+  return row ? row.value : DEFAULT_NOTE_PLACEHOLDER;
+}
+
+export async function updateSettings(db, payload) {
+  if (!payload || !Object.prototype.hasOwnProperty.call(payload, "note_placeholder")) {
+    throw new ApiError(400, "没有需要保存的设置");
+  }
+  let value = "";
+  if (payload.note_placeholder !== undefined && payload.note_placeholder !== null) {
+    if (typeof payload.note_placeholder !== "string") throw new ApiError(400, "备注提示语格式无效");
+    value = normalizeSpaces(payload.note_placeholder);
+  }
+  if ([...value].length > 160) throw new ApiError(400, "备注提示语不能超过 160 个字符");
+  await run(
+    db,
+    `INSERT INTO app_settings (key, value, updated_at)
+     VALUES ('note_placeholder', ?, ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
+    value,
+    shanghaiDateTime(),
+  );
+  return { note_placeholder: value };
+}
+
+// ---------------------------------------------------------------------------
 // 行映射
 // ---------------------------------------------------------------------------
 
@@ -198,6 +340,11 @@ function categoryPathFromRow(row) {
 
 export function toProduct(row) {
   const id = Number(row.id);
+  const noteImageId =
+    row.note_image_id === null || row.note_image_id === undefined
+      ? null
+      : Number(row.note_image_id);
+  const noteText = row.note_text || "";
   return {
     id,
     category_id: row.category_id === null || row.category_id === undefined ? null : Number(row.category_id),
@@ -214,6 +361,11 @@ export function toProduct(row) {
       row.active_rental_id === null || row.active_rental_id === undefined
         ? null
         : Number(row.active_rental_id),
+    note_mode: row.note_mode || "",
+    note_text: noteText,
+    note_image_url: noteImageId ? `/api/notes/image/${noteImageId}` : "",
+    note_updated_at: row.note_updated_at ?? null,
+    has_note: Boolean(noteText || noteImageId),
   };
 }
 
@@ -707,6 +859,14 @@ export async function deleteCategory(db, categoryId, cascade = false) {
   }
   if (active) throw new ApiError(409, `该品类树中还有 ${active} 件产品在借，请先归还`);
 
+  const noteImageRows = await all(
+    db,
+    `SELECT DISTINCT note_image_id FROM products
+      WHERE category_id IN (${placeholders}) AND note_image_id IS NOT NULL`,
+    ...ids,
+  );
+  const noteImageIds = noteImageRows.map((row) => Number(row.note_image_id));
+
   const statements = [];
   let deletedProducts = 0;
   if (products) {
@@ -719,6 +879,9 @@ export async function deleteCategory(db, categoryId, cascade = false) {
     statements.push(db.prepare("DELETE FROM categories WHERE id = ?").bind(nodeId));
   }
   if (statements.length) await db.batch(statements);
+  for (const imageId of noteImageIds) {
+    await deleteNoteImageIfUnused(db, imageId);
+  }
   return { ok: true, deleted_products: deletedProducts };
 }
 
@@ -728,10 +891,12 @@ export async function deleteProduct(db, productId) {
   if (product.status === "rented") {
     throw new ApiError(409, `「${product.name}」正在借出，请先归还再删除`);
   }
+  const noteImageId = product.note_image_id ?? null;
   await db.batch([
     db.prepare("UPDATE rental_history SET product_id = NULL WHERE product_id = ?").bind(productId),
     db.prepare("DELETE FROM products WHERE id = ?").bind(productId),
   ]);
+  await deleteNoteImageIfUnused(db, noteImageId);
   return { ok: true, id: productId, name: product.name };
 }
 
@@ -746,20 +911,31 @@ export async function createProducts(db, payload) {
   const modelKey = payload?.model_key;
   const modelBase = await modelBaseUrl(db, modelKey);
   if (modelBase === null) throw new ApiError(400, "请选择有效的展示模型");
+  const note = await parseProductNote(db, payload);
 
   const createdIds = [];
-  for (let index = 0; index < quantity; index += 1) {
-    const result = await run(
-      db,
-      `INSERT INTO products
-         (category_id, category, name, model_url, status, current_borrower, current_lend_date)
-       VALUES (?, ?, ?, ?, 'in_stock', NULL, NULL)`,
-      categoryId,
-      category.name,
-      name,
-      modelBase,
-    );
-    createdIds.push(lastRowId(result));
+  try {
+    for (let index = 0; index < quantity; index += 1) {
+      const result = await run(
+        db,
+        `INSERT INTO products
+           (category_id, category, name, model_url, status, current_borrower, current_lend_date,
+            note_mode, note_text, note_image_id, note_updated_at)
+         VALUES (?, ?, ?, ?, 'in_stock', NULL, NULL, ?, ?, ?, ?)`,
+        categoryId,
+        category.name,
+        name,
+        modelBase,
+        note.mode,
+        note.text,
+        note.imageId,
+        note.mode ? shanghaiDateTime() : null,
+      );
+      createdIds.push(lastRowId(result));
+    }
+  } catch (error) {
+    await deleteNoteImageIfUnused(db, note.imageId);
+    throw error;
   }
   const products = [];
   for (const productId of createdIds) {

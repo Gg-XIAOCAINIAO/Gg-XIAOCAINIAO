@@ -255,6 +255,50 @@ async function main() {
     // 9. 级联删除与空品类
     const emptyRoot = await req("POST", "/api/categories", { name: "空品类" });
     eq((await req("DELETE", `/api/categories/${emptyRoot.data.id}`)).status, 200, "delete empty category");
+
+    // 10. 产品备注照片与管理员提示语
+    const png = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+      "base64",
+    ).toString("base64");
+    const noteProducts = await req("POST", "/api/products", {
+      name: "备注测试产品",
+      category_id: studioChild.data.id,
+      quantity: 2,
+      model_key: "lounge-chair",
+      note_text: "第一行\n第二行",
+      note_image: `data:image/png;base64,${png}`,
+    });
+    eq(noteProducts.status, 201, "create product with note");
+    const noteProduct = noteProducts.data[0];
+    eq(noteProduct.note_mode, "both", "note mode both");
+    eq(noteProduct.note_text, "第一行\n第二行", "note text preserved");
+    check(noteProduct.has_note === true, "has_note true");
+    check(noteProduct.note_image_url.startsWith("/api/notes/image/"), "note image url");
+
+    const imageRes = await fetch(base + noteProduct.note_image_url);
+    eq(imageRes.status, 200, "note image status");
+    eq(imageRes.headers.get("content-type"), "image/png", "note image mime");
+    const imageBytes = new Uint8Array(await imageRes.arrayBuffer());
+    check(imageBytes.length === 70, "note image bytes");
+
+    await req("DELETE", `/api/products/${noteProduct.id}`);
+    const imageStillThere = await fetch(base + noteProduct.note_image_url);
+    eq(imageStillThere.status, 200, "image kept while duplicate uses it");
+    await req("DELETE", `/api/products/${noteProducts.data[1].id}`);
+    const imageGone = await fetch(base + noteProduct.note_image_url);
+    eq(imageGone.status, 404, "image removed after last product deleted");
+
+    const settings = await req("GET", "/api/settings");
+    eq(settings.status, 200, "settings status");
+    check(typeof settings.data.note_placeholder === "string", "default placeholder string");
+    const originalPlaceholder = settings.data.note_placeholder;
+    const updatedSettings = await req("PATCH", "/api/settings", { note_placeholder: "测试提示语" });
+    eq(updatedSettings.status, 200, "update settings");
+    eq(updatedSettings.data.note_placeholder, "测试提示语", "settings response value");
+    eq((await req("GET", "/api/settings")).data.note_placeholder, "测试提示语", "settings persisted");
+    eq((await req("PATCH", "/api/settings", { note_placeholder: "太".repeat(161) })).status, 400, "placeholder length limit");
+    await req("PATCH", "/api/settings", { note_placeholder: originalPlaceholder });
   } finally {
     server.close();
     try { rmSync(tmpDir, { recursive: true, force: true }); } catch { /* 忽略沙箱清理失败 */ }

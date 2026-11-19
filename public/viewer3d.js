@@ -1559,6 +1559,8 @@ export class ProductViewer {
     };
 
     this.onWheel = (event) => {
+      // 默认让滚轮滚动页面，只有按住 Ctrl / ⌘ 时才缩放模型，避免进入页面就被 3D 画布拦住。
+      if (!event.ctrlKey && !event.metaKey) return;
       event.preventDefault();
       this.targetDistance = THREE.MathUtils.clamp(
         this.targetDistance + event.deltaY * 0.0035,

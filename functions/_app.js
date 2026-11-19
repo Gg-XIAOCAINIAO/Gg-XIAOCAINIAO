@@ -27,6 +27,8 @@ import {
   deleteProduct,
   deleteUser,
   findUserByUsername,
+  getNoteImage,
+  getNotePlaceholder,
   hideBuiltinModel,
   importCustomModel,
   listBorrowers,
@@ -43,6 +45,7 @@ import {
   returnRentalsBatch,
   touchLastLogin,
   updateProductModels,
+  updateSettings,
   updateUser,
 } from "./_logic.js";
 
@@ -293,6 +296,21 @@ async function handleGet(request, env, path, searchParams) {
   if (path === "/api/models") {
     return json(200, await listModels(db));
   }
+  if (path === "/api/settings") {
+    return json(200, { note_placeholder: await getNotePlaceholder(db) });
+  }
+  const noteImageMatch = path.match(/^\/api\/notes\/image\/(\d+)$/);
+  if (noteImageMatch) {
+    const image = await getNoteImage(db, Number(noteImageMatch[1]));
+    return new Response(image.bytes, {
+      status: 200,
+      headers: {
+        "Content-Type": image.mime,
+        "Cache-Control": "private, max-age=86400",
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
+  }
   if (path === "/api/history") {
     const dateFrom = parseIsoDate(firstQuery(searchParams, "from"), "from", false);
     const dateTo = parseIsoDate(firstQuery(searchParams, "to"), "to", false);
@@ -362,6 +380,9 @@ async function handleWrite(request, env, method, path, searchParams, payload) {
   }
   if (method === "POST" && path === "/api/models/restore") {
     return json(200, await restoreBuiltinModel(db, payload.key));
+  }
+  if (method === "PATCH" && path === "/api/settings") {
+    return json(200, await updateSettings(db, payload));
   }
   if (method === "POST" && path === "/api/products") {
     return json(201, await createProducts(db, payload));

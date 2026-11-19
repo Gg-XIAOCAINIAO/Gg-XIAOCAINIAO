@@ -33,7 +33,7 @@ async function initDatabase(env) {
   await bootstrapAdmin(env);
 }
 
-/** 老库补列：rental_history 的经手人字段（新库已在 SCHEMA_SQL 中创建）。 */
+/** 老库补列：rental_history 的经手人字段、products 的备注字段（新库已在 SCHEMA_SQL 中创建）。 */
 async function migrateColumns(db) {
   const columns = await tableColumns(db, "rental_history");
   if (!columns.has("lend_operator")) {
@@ -41,6 +41,19 @@ async function migrateColumns(db) {
   }
   if (!columns.has("return_operator")) {
     await db.exec("ALTER TABLE rental_history ADD COLUMN return_operator TEXT");
+  }
+  const productColumns = await tableColumns(db, "products");
+  if (!productColumns.has("note_mode")) {
+    await db.exec("ALTER TABLE products ADD COLUMN note_mode TEXT NOT NULL DEFAULT ''");
+  }
+  if (!productColumns.has("note_text")) {
+    await db.exec("ALTER TABLE products ADD COLUMN note_text TEXT NOT NULL DEFAULT ''");
+  }
+  if (!productColumns.has("note_image_id")) {
+    await db.exec("ALTER TABLE products ADD COLUMN note_image_id INTEGER");
+  }
+  if (!productColumns.has("note_updated_at")) {
+    await db.exec("ALTER TABLE products ADD COLUMN note_updated_at TEXT");
   }
 }
 

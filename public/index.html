@@ -87,7 +87,7 @@
             <canvas id="scene" aria-label="产品三维展示，可拖拽旋转"></canvas>
             <div class="viewer-hint" id="viewer-hint">
               <span class="hint-line" aria-hidden="true"></span>
-              拖拽旋转 · 滚轮缩放
+              拖拽旋转 · Ctrl/⌘ + 滚轮缩放
             </div>
             <div class="viewer-topline">
               <span class="product-index" id="product-index">01 / 18</span>
@@ -131,6 +131,15 @@
               <div class="collection-side">
                 <button class="btn btn-primary btn-compact collection-add" id="product-add-open" type="button"
                         aria-haspopup="dialog" aria-controls="admin-drawer">＋ 添加产品</button>
+                <button class="collection-tool" id="gallery-open" type="button" aria-haspopup="dialog" aria-controls="gallery-dialog">
+                  <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                    <rect x="2.5" y="2.5" width="5.4" height="5.4" rx="1.1" stroke="currentColor" stroke-width="1.1"/>
+                    <rect x="10.1" y="2.5" width="5.4" height="5.4" rx="1.1" stroke="currentColor" stroke-width="1.1"/>
+                    <rect x="2.5" y="10.1" width="5.4" height="5.4" rx="1.1" stroke="currentColor" stroke-width="1.1"/>
+                    <rect x="10.1" y="10.1" width="5.4" height="5.4" rx="1.1" stroke="currentColor" stroke-width="1.1"/>
+                  </svg>
+                  <span>全屏浏览</span>
+                </button>
                 <button class="guide-trigger" id="guide-open" type="button" aria-haspopup="dialog" aria-controls="guide-dialog">
                   <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
                     <circle cx="9" cy="9" r="7.3" stroke="currentColor" stroke-width="1.2"/>
@@ -145,7 +154,7 @@
               <button class="strip-arrow strip-arrow--prev" id="strip-prev" type="button" aria-label="向左浏览器物" disabled>
                 <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m8 2-4 4 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
-              <div class="product-strip" id="product-strip" aria-label="产品列表"></div>
+              <div class="product-strip" id="product-strip" aria-label="产品列表" title="鼠标滚轮可左右滑动"></div>
               <button class="strip-arrow strip-arrow--next" id="strip-next" type="button" aria-label="向右浏览器物" disabled>
                 <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m4 2 4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
@@ -575,6 +584,66 @@
     </form>
   </dialog>
 
+  <!-- 全部器物大屏浏览 -->
+  <dialog class="modal-dialog gallery-dialog" id="gallery-dialog" aria-labelledby="gallery-title">
+    <div class="modal-card gallery-card">
+      <header class="gallery-head">
+        <div class="gallery-title-block">
+          <span class="section-label">ALL OBJECTS</span>
+          <h2 id="gallery-title">全部器物</h2>
+          <p class="modal-product" id="gallery-summary">按名称、编号或品类筛选。</p>
+        </div>
+        <div class="gallery-tools">
+          <label class="gallery-search" for="gallery-search">
+            <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <circle cx="7.9" cy="7.9" r="5.4" stroke="currentColor" stroke-width="1.3"/>
+              <path d="m12 12 3.2 3.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            <input id="gallery-search" type="search" placeholder="搜索名称、编号或品类" autocomplete="off">
+          </label>
+          <button class="gallery-fullscreen" id="gallery-fullscreen" type="button">
+            <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <path d="M6.5 2.8H2.8v3.7M11.5 2.8h3.7v3.7M6.5 15.2H2.8v-3.7M11.5 15.2h3.7v-3.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>全屏</span>
+          </button>
+          <button class="modal-close" type="button" data-close aria-label="关闭全部器物">
+            <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="m3.5 3.5 11 11m0-11-11 11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </header>
+      <div class="gallery-grid" id="gallery-grid"></div>
+      <p class="gallery-empty" id="gallery-empty" hidden>没有匹配的器物。</p>
+    </div>
+  </dialog>
+
+  <!-- 产品备注查看 -->
+  <dialog class="modal-dialog note-dialog" id="note-dialog" aria-labelledby="note-dialog-title">
+    <form method="dialog" class="modal-card note-card">
+      <button class="modal-close" type="button" data-close aria-label="关闭备注">
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="m3.5 3.5 11 11m0-11-11 11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </button>
+      <span class="section-label">PRODUCT NOTE</span>
+      <h2 id="note-dialog-title">器物备注</h2>
+      <p class="modal-product" id="note-product-name">—</p>
+      <p class="note-category" id="note-category"></p>
+
+      <div class="note-body" id="note-body">
+        <p class="note-text" id="note-text"></p>
+        <div class="note-image-wrap" id="note-image-wrap" hidden>
+          <a class="note-image-link" id="note-image-link" target="_blank" rel="noopener" title="在新窗口查看原图">
+            <img id="note-image" alt="器物备注照片">
+          </a>
+        </div>
+      </div>
+      <p class="note-empty" id="note-empty" hidden>这件器物还没有备注。</p>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="submit" value="close">关闭</button>
+      </div>
+    </form>
+  </dialog>
+
   <!-- 3D 模型工坊 -->
   <aside class="model-drawer" id="model-drawer" role="dialog" aria-modal="false"
          aria-labelledby="model-drawer-title" aria-hidden="true" hidden>
@@ -774,9 +843,63 @@
               <select id="admin-product-model"></select>
             </div>
           </div>
+          <div class="admin-field admin-note-field">
+            <div class="admin-note-head">
+              <span class="admin-note-label">备注（可选）</span>
+              <span class="admin-note-sub">文字、照片，随便来点</span>
+              <button class="admin-note-edit admin-only" id="admin-note-placeholder-edit" type="button">改提示语</button>
+            </div>
+            <div class="admin-note-panel">
+              <textarea id="admin-product-note" rows="3" maxlength="300"
+                        placeholder="给器物留个便签吧——可以备注一下用来干啥（办公或自用），最好拍张产品照片上传哦～"></textarea>
+              <span class="admin-note-count" id="admin-note-count">0 / 300</span>
+            </div>
+            <div class="admin-note-panel admin-note-panel--photo">
+              <input id="admin-product-note-image" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+              <label class="note-upload" id="admin-note-upload" for="admin-product-note-image">
+                <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                  <rect x="2.5" y="3.5" width="13" height="11" rx="2" stroke="currentColor" stroke-width="1.2"/>
+                  <circle cx="6.4" cy="7.4" r="1.35" stroke="currentColor" stroke-width="1.1"/>
+                  <path d="m4.2 12.4 3.4-3.2 2.2 2 1.7-1.6 2.3 2.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                上传照片（可选）
+              </label>
+              <div class="note-preview" id="admin-note-preview" hidden>
+                <img id="admin-note-preview-img" alt="备注照片预览">
+                <div class="note-preview-info">
+                  <span id="admin-note-filename">—</span>
+                  <button class="note-preview-remove" id="admin-note-remove" type="button">移除</button>
+                </div>
+              </div>
+              <small class="admin-note-help">只写文字或只传照片都可以，不需要额外选类型；支持 JPG / PNG / WebP，单张不超过 8 MB，会自动压缩。</small>
+            </div>
+            <small class="field-error" id="admin-note-error" aria-live="polite"></small>
+          </div>
           <button class="btn btn-primary admin-submit" type="submit">新增产品</button>
         </form>
-        <p class="admin-hint">没有合适的小类？先在上面「品类结构」里新建，创建后会自动选中。数量大于 1 时会创建多件同名的独立产品，借出时可按件选择。</p>
+        <p class="admin-hint">打开面板时会自动带入当前选中的品类与推荐模型。数量大于 1 时会创建多件同名的独立产品，借出时可按件选择。</p>
+      </section>
+
+      <section class="admin-section admin-only" id="admin-note-placeholder-section">
+        <div class="admin-section-head">
+          <div>
+            <h3>备注提示语</h3>
+            <p>显示在新增产品备注框里的灰色提示，管理员可以随时修改。</p>
+          </div>
+          <span class="admin-count">文案</span>
+        </div>
+
+        <form class="admin-placeholder-form" id="note-placeholder-form">
+          <div class="admin-field">
+            <label for="note-placeholder-input">提示文字</label>
+            <textarea id="note-placeholder-input" rows="2" maxlength="160"></textarea>
+            <small class="field-error" id="note-placeholder-error" aria-live="polite"></small>
+          </div>
+          <div class="admin-placeholder-actions">
+            <button class="btn btn-ghost btn-compact" id="note-placeholder-reset" type="button">恢复默认</button>
+            <button class="btn btn-primary btn-compact" id="note-placeholder-save" type="submit">保存提示语</button>
+          </div>
+        </form>
       </section>
     </div>
 

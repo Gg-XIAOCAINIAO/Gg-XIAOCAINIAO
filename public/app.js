@@ -3,6 +3,8 @@ import { ProductViewer, parseModelUrl } from "./viewer3d.js";
 const $ = (selector, scope = document) => scope.querySelector(selector);
 const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
 
+const DEFAULT_NOTE_PLACEHOLDER = "给器物留个便签吧——可以备注一下用来干啥（办公或自用），最好拍张产品照片上传哦～";
+
 const els = {
   headerDate: $("#header-date"),
   tabs: $$(".view-tab"),
@@ -17,6 +19,7 @@ const els = {
   stripPrev: $("#strip-prev"),
   stripNext: $("#strip-next"),
   collectionCount: $("#collection-count"),
+  galleryOpen: $("#gallery-open"),
   productIndex: $("#product-index"),
   productStatus: $("#product-status"),
   productCategory: $("#product-category"),
@@ -151,9 +154,41 @@ const els = {
   adminProductCategory: $("#admin-product-category"),
   adminProductQuantity: $("#admin-product-quantity"),
   adminProductModel: $("#admin-product-model"),
+  adminProductSection: $("#admin-product-section"),
+  adminNoteText: $("#admin-product-note"),
+  adminNoteCount: $("#admin-note-count"),
+  adminNoteFile: $("#admin-product-note-image"),
+  adminNotePreview: $("#admin-note-preview"),
+  adminNotePreviewImg: $("#admin-note-preview-img"),
+  adminNoteFilename: $("#admin-note-filename"),
+  adminNoteRemove: $("#admin-note-remove"),
+  adminNoteError: $("#admin-note-error"),
+  notePlaceholderEdit: $("#admin-note-placeholder-edit"),
+  notePlaceholderSection: $("#admin-note-placeholder-section"),
+  notePlaceholderForm: $("#note-placeholder-form"),
+  notePlaceholderInput: $("#note-placeholder-input"),
+  notePlaceholderError: $("#note-placeholder-error"),
+  notePlaceholderReset: $("#note-placeholder-reset"),
+  notePlaceholderSave: $("#note-placeholder-save"),
   confirmDialog: $("#confirm-dialog"),
   confirmTitle: $("#confirm-title"),
   confirmMessage: $("#confirm-message"),
+  noteDialog: $("#note-dialog"),
+  noteProductName: $("#note-product-name"),
+  noteCategory: $("#note-category"),
+  noteBody: $("#note-body"),
+  noteText: $("#note-text"),
+  noteImageWrap: $("#note-image-wrap"),
+  noteImageLink: $("#note-image-link"),
+  noteImage: $("#note-image"),
+  noteEmpty: $("#note-empty"),
+  galleryDialog: $("#gallery-dialog"),
+  galleryGrid: $("#gallery-grid"),
+  gallerySearch: $("#gallery-search"),
+  gallerySummary: $("#gallery-summary"),
+  galleryEmpty: $("#gallery-empty"),
+  galleryFullscreen: $("#gallery-fullscreen"),
+  galleryFullscreenLabel: $("#gallery-fullscreen span"),
   toast: $("#toast"),
 };
 
@@ -522,6 +557,11 @@ const state = {
   searchTimer: null,
   dialogProductId: null,
   borrowAlternatives: [],
+  adminNoteData: "",
+  noteProductId: null,
+  galleryQuery: "",
+  galleryFullscreen: false,
+  notePlaceholder: DEFAULT_NOTE_PLACEHOLDER,
 };
 
 // ---------------------------------------------------------------------------
@@ -639,6 +679,210 @@ async function api(path, options = {}) {
 
 function getSelectedProduct() {
   return state.products.find((product) => product.id === state.selectedId) || null;
+}
+
+function productHasNote(product) {
+  return Boolean(product && (product.note_text || product.note_image_url));
+}
+
+function syncModalOpenClass() {
+  document.body.classList.toggle("modal-open", Boolean($("dialog[open]")));
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(new Error("文件读取失败，请重试"));
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImageElement(source) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("照片解析失败，请换一张试试"));
+    image.src = source;
+  });
+}
+
+async function compressNoteImage(file) {
+  if (!file || !file.type.startsWith("image/")) {
+    throw new Error("请选择 JPG / PNG / WebP 照片");
+  }
+  if (file.size > 8 * 1024 * 1024) {
+    throw new Error("照片不能超过 8 MB");
+  }
+  const source = await readFileAsDataURL(file);
+  const image = await loadImageElement(source);
+  const width = image.naturalWidth || image.width;
+  const height = image.naturalHeight || image.height;
+  if (!width || !height) throw new Error("照片尺寸无效，请换一张试试");
+
+  const maxSide = 1400;
+  const ratio = Math.min(1, maxSide / Math.max(width, height));
+  const targetWidth = Math.max(1, Math.round(width * ratio));
+  const targetHeight = Math.max(1, Math.round(height * ratio));
+  const canvas = document.createElement("canvas");
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+  const context = canvas.getContext("2d");
+  if (!context) return source;
+  context.fillStyle = "#FFFFFF";
+  context.fillRect(0, 0, targetWidth, targetHeight);
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(image, 0, 0, targetWidth, targetHeight);
+  let compressed = canvas.toDataURL("image/jpeg", 0.84);
+  if (compressed.length > 1.2 * 1024 * 1024) {
+    compressed = canvas.toDataURL("image/jpeg", 0.7);
+  }
+  if (compressed.length > 1.3 * 1024 * 1024) {
+    throw new Error("照片压缩后仍然过大，请换一张");
+  }
+  return compressed;
+}
+
+function updateAdminNoteCount() {
+  const length = Array.from(els.adminNoteText.value).length;
+  els.adminNoteCount.textContent = `${length} / 300`;
+}
+
+function resetAdminNote() {
+  state.adminNoteData = "";
+  els.adminNoteText.value = "";
+  els.adminNoteFile.value = "";
+  els.adminNotePreview.hidden = true;
+  els.adminNotePreviewImg.removeAttribute("src");
+  els.adminNoteFilename.textContent = "";
+  els.adminNoteError.textContent = "";
+  updateAdminNoteCount();
+}
+
+function applyNotePlaceholder(value) {
+  const text = typeof value === "string" ? value : "";
+  state.notePlaceholder = text;
+  els.adminNoteText.placeholder = text;
+  if (els.notePlaceholderInput) els.notePlaceholderInput.value = text;
+}
+
+async function fetchSettings() {
+  try {
+    const settings = await api("/api/settings");
+    applyNotePlaceholder(settings?.note_placeholder ?? DEFAULT_NOTE_PLACEHOLDER);
+  } catch (error) {
+    console.warn("settings load failed", error);
+    applyNotePlaceholder(DEFAULT_NOTE_PLACEHOLDER);
+  }
+}
+
+async function saveNotePlaceholder(value) {
+  const text = String(value ?? "").trim();
+  els.notePlaceholderError.textContent = "";
+  const original = els.notePlaceholderSave.textContent;
+  els.notePlaceholderSave.disabled = true;
+  els.notePlaceholderSave.textContent = "保存中…";
+  try {
+    const settings = await api("/api/settings", {
+      method: "PATCH",
+      body: { note_placeholder: text },
+    });
+    applyNotePlaceholder(settings.note_placeholder);
+    showToast("备注提示语已更新");
+  } catch (error) {
+    els.notePlaceholderError.textContent = error.message;
+  } finally {
+    els.notePlaceholderSave.disabled = false;
+    els.notePlaceholderSave.textContent = original;
+  }
+}
+
+function submitNotePlaceholder(event) {
+  event.preventDefault();
+  saveNotePlaceholder(els.notePlaceholderInput.value);
+}
+
+function resetNotePlaceholder() {
+  els.notePlaceholderInput.value = DEFAULT_NOTE_PLACEHOLDER;
+  saveNotePlaceholder(DEFAULT_NOTE_PLACEHOLDER);
+}
+
+function openNotePlaceholderEditor() {
+  if (!els.notePlaceholderSection) return;
+  els.notePlaceholderSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  window.setTimeout(() => {
+    if (!state.adminOpen) return;
+    els.notePlaceholderInput.focus({ preventScroll: true });
+    els.notePlaceholderInput.select();
+  }, 280);
+}
+
+async function handleAdminNoteFileChange() {
+  const file = els.adminNoteFile.files?.[0];
+  if (!file) return;
+  els.adminNoteError.textContent = "";
+  try {
+    const data = await compressNoteImage(file);
+    state.adminNoteData = data;
+    els.adminNotePreviewImg.src = data;
+    els.adminNotePreview.hidden = false;
+    els.adminNoteFilename.textContent = `${file.name} · ${formatBytes(file.size)}`;
+    els.adminNoteFilename.title = file.name;
+  } catch (error) {
+    state.adminNoteData = "";
+    els.adminNoteFile.value = "";
+    els.adminNotePreview.hidden = true;
+    els.adminNotePreviewImg.removeAttribute("src");
+    els.adminNoteFilename.textContent = "";
+    els.adminNoteError.textContent = error.message;
+  }
+}
+
+function removeAdminNoteImage() {
+  state.adminNoteData = "";
+  els.adminNoteFile.value = "";
+  els.adminNotePreview.hidden = true;
+  els.adminNotePreviewImg.removeAttribute("src");
+  els.adminNoteFilename.textContent = "";
+  els.adminNoteError.textContent = "";
+}
+
+function productNotePayload() {
+  return {
+    note_text: els.adminNoteText.value.trim(),
+    note_image: state.adminNoteData,
+  };
+}
+
+function openNoteDialog(productId) {
+  const product = state.products.find((item) => item.id === productId);
+  if (!product) return;
+  state.noteProductId = product.id;
+  const hasText = Boolean(product.note_text);
+  const hasImage = Boolean(product.note_image_url);
+
+  els.noteProductName.textContent = product.name;
+  els.noteCategory.textContent = `${product.category_path} · ${product.asset_code}`;
+  els.noteText.textContent = product.note_text || "";
+  els.noteText.hidden = !hasText;
+  els.noteBody.hidden = !hasText && !hasImage;
+  els.noteEmpty.hidden = hasText || hasImage;
+
+  if (hasImage) {
+    els.noteImage.src = product.note_image_url;
+    els.noteImage.alt = `${product.name} 的备注照片`;
+    els.noteImageLink.href = product.note_image_url;
+    els.noteImageWrap.hidden = false;
+  } else {
+    els.noteImage.removeAttribute("src");
+    els.noteImage.alt = "";
+    els.noteImageLink.removeAttribute("href");
+    els.noteImageWrap.hidden = true;
+  }
+
+  els.noteDialog.showModal();
+  syncModalOpenClass();
 }
 
 function modelKey(product) {
@@ -928,13 +1172,14 @@ function renderProductStrip() {
   els.productStrip.innerHTML = products.map((product) => {
     const active = product.id === state.selectedId ? " is-active" : "";
     const rented = product.status === "rented";
+    const note = productHasNote(product);
     const key = modelKey(product);
     const deleteLabel = rented
       ? `「${escapeHtml(product.name)}」正在借出，归还后可删除`
       : `删除「${escapeHtml(product.name)}」`;
     return `
       <div class="product-card-wrap">
-        <button class="product-card${active}${rented ? " is-rented" : ""}" type="button" data-product-id="${product.id}"
+        <button class="product-card${active}${rented ? " is-rented" : ""}${note ? " has-note" : ""}" type="button" data-product-id="${product.id}"
                 aria-pressed="${product.id === state.selectedId}" title="${escapeHtml(product.name)} · ${escapeHtml(product.asset_code)}">
           <span class="thumb">${THUMBNAILS[key] || THUMBNAILS[isCustomModel(key) ? "generated" : "lounge-chair"]}</span>
           <span class="pc-overline">${escapeHtml(product.asset_code)} / ${escapeHtml(product.category)}</span>
@@ -945,6 +1190,14 @@ function renderProductStrip() {
             ${rented ? `<span class="pc-borrower">${escapeHtml(product.current_borrower || "")}</span>` : ""}
           </span>
         </button>
+        ${note ? `
+          <button class="product-note" type="button" data-product-note="${product.id}"
+                  aria-label="查看「${escapeHtml(product.name)}」的备注" title="查看备注">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 3.5h10v7.2H7.4L4.6 13v-2.3H3V3.5Z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/>
+              <path d="M5.4 6h5.2M5.4 8.2h3.4" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+            </svg>
+          </button>` : ""}
         <button class="product-delete" type="button" data-product-delete="${product.id}"
                 aria-label="${deleteLabel}" title="${deleteLabel}"${rented ? " disabled" : ""}>
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 4.5h9M6 4.5V3h4v1.5M5 4.5l.4 8h5.2l.4-8M7 7v3.2M9 7v3.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -967,6 +1220,101 @@ function updateStripArrows() {
 function scrollProductStrip(direction) {
   const amount = Math.max(190, els.productStrip.clientWidth * 0.78);
   els.productStrip.scrollBy({ left: amount * direction, behavior: "smooth" });
+}
+
+function galleryFilteredProducts() {
+  const query = els.gallerySearch.value.trim().toLowerCase();
+  if (!query) return state.products;
+  return state.products.filter((product) =>
+    `${product.name} ${product.asset_code} ${product.category_path} ${product.category}`
+      .toLowerCase()
+      .includes(query)
+  );
+}
+
+function renderGallery() {
+  const items = galleryFilteredProducts();
+  const total = state.products.length;
+  const query = els.gallerySearch.value.trim();
+  els.gallerySummary.textContent = query
+    ? `找到 ${items.length} 件 / 共 ${total} 件器物`
+    : `共 ${total} 件器物，点选任意一件回到产品视图。`;
+  els.galleryEmpty.hidden = items.length > 0;
+  els.galleryGrid.hidden = items.length === 0;
+
+  els.galleryGrid.innerHTML = items.map((product) => {
+    const rented = product.status === "rented";
+    const key = modelKey(product);
+    const note = productHasNote(product)
+      ? `<button class="gallery-note" type="button" data-gallery-note="${product.id}"
+                 aria-label="查看「${escapeHtml(product.name)}」的备注" title="查看备注">
+           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+             <path d="M3 3.5h10v7.2H7.4L4.6 13v-2.3H3V3.5Z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/>
+             <path d="M5.4 6h5.2M5.4 8.2h3.4" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+           </svg>
+           备注
+         </button>`
+      : "";
+    const status = rented
+      ? `出租中${product.current_borrower ? ` · ${escapeHtml(product.current_borrower)}` : ""}`
+      : "在库";
+    return `
+      <div class="gallery-item">
+        <button class="gallery-item-main" type="button" data-gallery-product="${product.id}"
+                title="选中「${escapeHtml(product.name)}」">
+          <span class="gallery-thumb">${THUMBNAILS[key] || THUMBNAILS[isCustomModel(key) ? "generated" : "lounge-chair"]}</span>
+          <span class="gallery-overline">${escapeHtml(product.asset_code)} / ${escapeHtml(product.category)}</span>
+          <span class="gallery-name">${escapeHtml(product.name)}</span>
+        </button>
+        <div class="gallery-item-foot">
+          <span class="gallery-state${rented ? " is-rented" : ""}"><i aria-hidden="true"></i>${status}</span>
+          ${note}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function openGallery() {
+  els.gallerySearch.value = "";
+  renderGallery();
+  els.galleryDialog.showModal();
+  syncModalOpenClass();
+}
+
+function selectGalleryProduct(productId) {
+  const product = state.products.find((item) => item.id === productId);
+  if (!product) return;
+  state.selectedId = product.id;
+  state.activeCategoryId = product.category_id;
+  expandCategoryAncestors(product.category_id);
+  if (els.galleryDialog.open) els.galleryDialog.close();
+  renderProducts();
+  setView("products", { updateHash: true, smooth: false });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function syncGalleryFullscreen() {
+  const active = document.fullscreenElement === els.galleryDialog;
+  state.galleryFullscreen = active;
+  if (els.galleryFullscreenLabel) {
+    els.galleryFullscreenLabel.textContent = active ? "退出全屏" : "全屏";
+  }
+  els.galleryFullscreen.setAttribute("aria-pressed", String(active));
+}
+
+async function toggleGalleryFullscreen() {
+  try {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    } else if (els.galleryDialog.requestFullscreen) {
+      await els.galleryDialog.requestFullscreen();
+    } else {
+      showToast("当前浏览器不支持全屏，可直接使用大屏模式");
+    }
+  } catch {
+    showToast("无法进入全屏，请检查浏览器权限");
+  }
 }
 
 function updateViewerInfo() {
@@ -2616,6 +2964,39 @@ function renderAdmin() {
   renderCategoryTree();
 }
 
+function currentAddCategoryId() {
+  const product = getSelectedProduct();
+  if (product?.category_id) return product.category_id;
+  const active = state.activeCategoryId ? findCategory(state.activeCategoryId) : null;
+  if (!active) return null;
+  if (!active.children.length) return active.id;
+  const leaf = flattenCategories().find(
+    (category) => !category.children.length && categoryContains(active, category.id)
+  );
+  return leaf?.id ?? null;
+}
+
+function preferredModelForAdd(categoryId) {
+  const product = getSelectedProduct();
+  if (product?.category_id === categoryId) {
+    const key = parseModelUrl(product.model_url).key;
+    if (allModelOptions().some(([value]) => value === key)) return key;
+  }
+  return suggestModelForCategory(categoryId);
+}
+
+function prefillAddProductForm(categoryId) {
+  if (!categoryId) return;
+  const value = String(categoryId);
+  const exists = Array.from(els.adminProductCategory.options).some(
+    (option) => option.value === value
+  );
+  if (!exists) return;
+  els.adminProductCategory.value = value;
+  const modelKey = preferredModelForAdd(categoryId);
+  if (modelKey) els.adminProductModel.value = modelKey;
+}
+
 function openAdmin(focus = "category") {
   if (state.modelOpen) closeModelStudio();
   const alreadyOpen = state.adminOpen;
@@ -2630,10 +3011,9 @@ function openAdmin(focus = "category") {
       els.adminDrawer.classList.add("is-open");
     });
     document.body.classList.add("admin-open");
-    renderAdmin();
-    const suggested = suggestModelForCategory(Number(els.adminProductCategory.value));
-    if (suggested) els.adminProductModel.value = suggested;
   }
+  renderAdmin();
+  prefillAddProductForm(currentAddCategoryId());
   window.setTimeout(() => {
     if (!state.adminOpen) return;
     if (focus === "product") {
@@ -2642,7 +3022,7 @@ function openAdmin(focus = "category") {
     } else {
       els.categoryName.focus();
     }
-  }, alreadyOpen ? 0 : 320);
+  }, alreadyOpen ? 80 : 320);
 }
 
 function closeAdmin() {
@@ -2778,6 +3158,7 @@ async function submitProductForm(event) {
     return;
   }
 
+  const note = productNotePayload();
   const button = $("button[type='submit']", els.productForm);
   const original = button.textContent;
   button.disabled = true;
@@ -2785,10 +3166,11 @@ async function submitProductForm(event) {
   try {
     const created = await api("/api/products", {
       method: "POST",
-      body: { name, category_id: Number(categoryId), quantity, model_key: modelKey },
+      body: { name, category_id: Number(categoryId), quantity, model_key: modelKey, ...note },
     });
     els.adminProductName.value = "";
     els.adminProductQuantity.value = "1";
+    resetAdminNote();
     await refreshAllData({ preserveSelection: false });
     if (created.length) {
       unfoldCategoryPath(created[0].category_id);
@@ -2897,7 +3279,7 @@ function askConfirm(title, message) {
     const dialog = els.confirmDialog;
     const onClose = () => {
       dialog.removeEventListener("close", onClose);
-      document.body.classList.remove("modal-open");
+      syncModalOpenClass();
       resolve(dialog.returnValue === "confirm");
     };
     dialog.addEventListener("close", onClose);
@@ -2954,6 +3336,11 @@ function bindEvents() {
   });
 
   els.productStrip.addEventListener("click", (event) => {
+    const noteButton = event.target.closest("[data-product-note]");
+    if (noteButton) {
+      openNoteDialog(Number(noteButton.dataset.productNote));
+      return;
+    }
     const deleteButton = event.target.closest("[data-product-delete]");
     if (deleteButton) {
       if (deleteButton.disabled) return;
@@ -2969,10 +3356,21 @@ function bindEvents() {
   els.stripNext.addEventListener("click", () => scrollProductStrip(1));
   els.productStrip.addEventListener("scroll", updateStripArrows, { passive: true });
   window.addEventListener("resize", updateStripArrows);
+  // 鼠标滚轮在器物列表上直接横向滑动；到达两端后把滚动交还给页面。
   els.productStrip.addEventListener("wheel", (event) => {
-    if (Math.abs(event.deltaX) >= Math.abs(event.deltaY) || !event.shiftKey) return;
+    if (event.ctrlKey || event.metaKey) return;
+    if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+    const strip = els.productStrip;
+    const maxScroll = strip.scrollWidth - strip.clientWidth;
+    if (maxScroll <= 2) return;
+    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? strip.clientWidth : 1;
+    const delta = event.deltaY * unit;
+    if (!delta) return;
+    const atStart = strip.scrollLeft <= 0 && delta < 0;
+    const atEnd = strip.scrollLeft >= maxScroll - 1 && delta > 0;
+    if (atStart || atEnd) return;
     event.preventDefault();
-    els.productStrip.scrollLeft += event.deltaY;
+    strip.scrollLeft += delta;
   }, { passive: false });
 
   els.productStrip.addEventListener("keydown", (event) => {
@@ -2987,6 +3385,21 @@ function bindEvents() {
     cards[next]?.focus();
     selectProduct(Number(cards[next].dataset.productId), { scroll: true });
   });
+
+  els.galleryOpen.addEventListener("click", openGallery);
+  els.gallerySearch.addEventListener("input", renderGallery);
+  els.galleryGrid.addEventListener("click", (event) => {
+    const noteButton = event.target.closest("[data-gallery-note]");
+    if (noteButton) {
+      openNoteDialog(Number(noteButton.dataset.galleryNote));
+      return;
+    }
+    const card = event.target.closest("[data-gallery-product]");
+    if (!card) return;
+    selectGalleryProduct(Number(card.dataset.galleryProduct));
+  });
+  els.galleryFullscreen.addEventListener("click", toggleGalleryFullscreen);
+  document.addEventListener("fullscreenchange", syncGalleryFullscreen);
 
   els.primaryAction.addEventListener("click", () => {
     const product = getSelectedProduct();
@@ -3046,7 +3459,7 @@ function bindEvents() {
     removeHistoryRecord(Number(button.dataset.historyDelete));
   });
 
-  $$("#rent-dialog [data-close], #return-dialog [data-close], #generate-dialog [data-close], #borrower-dialog [data-close], #history-dialog [data-close], #model-library-dialog [data-close], #guide-dialog [data-close]").forEach((button) => {
+  $$("dialog [data-close]").forEach((button) => {
     button.addEventListener("click", () => closeDialog(button.closest("dialog")));
   });
 
@@ -3055,7 +3468,7 @@ function bindEvents() {
       if (event.target === dialog) dialog.close();
     });
     dialog.addEventListener("close", () => {
-      document.body.classList.remove("modal-open");
+      syncModalOpenClass();
     });
   });
 
@@ -3154,6 +3567,12 @@ function bindEvents() {
     const suggested = suggestModelForCategory(Number(els.adminProductCategory.value));
     if (suggested) els.adminProductModel.value = suggested;
   });
+  els.adminNoteText.addEventListener("input", updateAdminNoteCount);
+  els.adminNoteFile.addEventListener("change", handleAdminNoteFileChange);
+  els.adminNoteRemove.addEventListener("click", removeAdminNoteImage);
+  els.notePlaceholderForm.addEventListener("submit", submitNotePlaceholder);
+  els.notePlaceholderReset.addEventListener("click", resetNotePlaceholder);
+  els.notePlaceholderEdit.addEventListener("click", openNotePlaceholderEditor);
 
   els.modelOpen.addEventListener("click", openModelStudio);
   els.modelClose.addEventListener("click", () => closeModelStudio());
@@ -3359,6 +3778,7 @@ async function init() {
   setHeaderDate();
   bindEvents();
   initAdminModelSelect();
+  updateAdminNoteCount();
   state.showEmptyCategories = readShowEmptyPreference();
   els.rentDate.value = todayISO();
   els.returnDate.value = todayISO();
@@ -3370,6 +3790,8 @@ async function init() {
   } catch (error) {
     console.error(error);
   }
+
+  await fetchSettings();
 
   try {
     const [products, categories, borrowers, historyAll, models] = await Promise.all([

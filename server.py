@@ -464,6 +464,10 @@ def to_product(row: sqlite3.Row) -> dict:
     category = row["category_name"] or row["category"]
     parent = row["category_parent"] or ""
     asset_code = f"P{int(row['id']):04d}"
+    keys = row.keys()
+    note_text = row["note_text"] if "note_text" in keys and row["note_text"] else ""
+    note_image_id = row["note_image_id"] if "note_image_id" in keys else None
+    note_image_url = f"/api/notes/image/{note_image_id}" if note_image_id else ""
     return {
         "id": row["id"],
         "category_id": row["category_id"],
@@ -477,6 +481,11 @@ def to_product(row: sqlite3.Row) -> dict:
         "current_borrower": row["current_borrower"],
         "current_lend_date": row["current_lend_date"],
         "active_rental_id": row["active_rental_id"] if "active_rental_id" in row.keys() else None,
+        "note_mode": row["note_mode"] if "note_mode" in keys and row["note_mode"] else "",
+        "note_text": note_text,
+        "note_image_url": note_image_url,
+        "note_updated_at": row["note_updated_at"] if "note_updated_at" in keys else None,
+        "has_note": bool(note_text or note_image_id),
     }
 
 

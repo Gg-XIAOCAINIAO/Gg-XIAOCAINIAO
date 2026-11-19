@@ -17,6 +17,13 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_categories_child_name
     ON categories(parent_id, name COLLATE NOCASE)
     WHERE parent_id IS NOT NULL;
 
+CREATE TABLE IF NOT EXISTS product_note_images (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    mime        TEXT    NOT NULL,
+    bytes       BLOB    NOT NULL,
+    created_at  TEXT    NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+
 CREATE TABLE IF NOT EXISTS products (
     id                 INTEGER PRIMARY KEY AUTOINCREMENT,
     category_id        INTEGER REFERENCES categories(id) ON DELETE RESTRICT,
@@ -27,6 +34,10 @@ CREATE TABLE IF NOT EXISTS products (
                        CHECK (status IN ('in_stock', 'rented')),
     current_borrower   TEXT,
     current_lend_date  TEXT,
+    note_mode          TEXT    NOT NULL DEFAULT '',
+    note_text          TEXT    NOT NULL DEFAULT '',
+    note_image_id      INTEGER REFERENCES product_note_images(id) ON DELETE SET NULL,
+    note_updated_at    TEXT,
     CHECK (
         (status = 'in_stock' AND current_borrower IS NULL AND current_lend_date IS NULL)
         OR
@@ -89,6 +100,13 @@ CREATE TABLE IF NOT EXISTS custom_models (
 CREATE TABLE IF NOT EXISTS hidden_models (
     model_key  TEXT PRIMARY KEY,
     hidden_at  TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+
+-- 可由管理员修改的站内文案等轻量设置。
+CREATE TABLE IF NOT EXISTS app_settings (
+    key         TEXT PRIMARY KEY,
+    value       TEXT NOT NULL DEFAULT '',
+    updated_at  TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
 );
 
 -- 登录账号（仅线上 Cloudflare 版本使用；本地 Python 版本不启用鉴权）。

@@ -19,6 +19,13 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_categories_child_name
     ON categories(parent_id, name COLLATE NOCASE)
     WHERE parent_id IS NOT NULL;
 
+CREATE TABLE IF NOT EXISTS product_note_images (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    mime        TEXT    NOT NULL,
+    bytes       BLOB    NOT NULL,
+    created_at  TEXT    NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+
 CREATE TABLE IF NOT EXISTS products (
     id                 INTEGER PRIMARY KEY AUTOINCREMENT,
     category_id        INTEGER REFERENCES categories(id) ON DELETE RESTRICT,
@@ -29,6 +36,10 @@ CREATE TABLE IF NOT EXISTS products (
                        CHECK (status IN ('in_stock', 'rented')),
     current_borrower   TEXT,
     current_lend_date  TEXT,
+    note_mode          TEXT    NOT NULL DEFAULT '',
+    note_text          TEXT    NOT NULL DEFAULT '',
+    note_image_id      INTEGER REFERENCES product_note_images(id) ON DELETE SET NULL,
+    note_updated_at    TEXT,
     CHECK (
         (status = 'in_stock' AND current_borrower IS NULL AND current_lend_date IS NULL)
         OR
@@ -91,6 +102,13 @@ CREATE TABLE IF NOT EXISTS custom_models (
 CREATE TABLE IF NOT EXISTS hidden_models (
     model_key  TEXT PRIMARY KEY,
     hidden_at  TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+
+-- 可由管理员修改的站内文案等轻量设置。
+CREATE TABLE IF NOT EXISTS app_settings (
+    key         TEXT PRIMARY KEY,
+    value       TEXT NOT NULL DEFAULT '',
+    updated_at  TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
 );
 
 -- 登录账号（仅线上 Cloudflare 版本使用；本地 Python 版本不启用鉴权）。
@@ -195,70 +213,70 @@ INSERT OR IGNORE INTO categories (id, parent_id, name, sort_order) VALUES (85, 8
 INSERT OR IGNORE INTO categories (id, parent_id, name, sort_order) VALUES (86, NULL, '网络服务', 8);
 INSERT OR IGNORE INTO categories (id, parent_id, name, sort_order) VALUES (87, 86, '路由器', 0);
 INSERT OR IGNORE INTO categories (id, parent_id, name, sort_order) VALUES (88, 86, '宽带', 1);
-INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (1, 75, '休闲椅', '云栖休闲椅', '/assets/models/lounge-chair.glb', 'rented', '陈知遥', '2026-11-11');
+INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (1, 75, '休闲椅', '云栖休闲椅', '/assets/models/lounge-chair.glb', 'rented', '陈知遥', '2026-11-12');
 INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (2, 76, '餐椅', '榉木餐椅', '/assets/models/dining-chair.glb', 'in_stock', NULL, NULL);
 INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (3, 77, '坐凳', '苔原矮凳', '/assets/models/stool.glb', 'in_stock', NULL, NULL);
-INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (4, 82, '台灯', '暖白台灯', '/assets/models/table-lamp.glb', 'rented', '林予安', '2026-10-31');
+INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (4, 82, '台灯', '暖白台灯', '/assets/models/table-lamp.glb', 'rented', '林予安', '2026-11-01');
 INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (5, 83, '落地灯', '弧光落地灯', '/assets/models/floor-lamp.glb', 'in_stock', NULL, NULL);
-INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (6, 12, '音响', '胡桃木音箱', '/assets/models/speaker.glb', 'rented', '周叙', '2026-11-15');
-INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (7, 13, '唱机', '黑胶唱机', '/assets/models/turntable.glb', 'rented', '林予安', '2026-11-06');
-INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (8, 45, '相机', '复古数码相机', '/assets/models/camera.glb', 'rented', '陈知遥', '2026-10-28');
-INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (9, 43, '投影仪', '便携投影仪', '/assets/models/projector.glb', 'rented', '苏晚', '2026-10-20');
+INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (6, 12, '音响', '胡桃木音箱', '/assets/models/speaker.glb', 'rented', '周叙', '2026-11-16');
+INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (7, 13, '唱机', '黑胶唱机', '/assets/models/turntable.glb', 'rented', '林予安', '2026-11-07');
+INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (8, 45, '相机', '复古数码相机', '/assets/models/camera.glb', 'rented', '陈知遥', '2026-10-29');
+INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (9, 43, '投影仪', '便携投影仪', '/assets/models/projector.glb', 'rented', '苏晚', '2026-10-21');
 INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (10, 79, '茶几', '低矮茶几', '/assets/models/coffee-table.glb', 'in_stock', NULL, NULL);
-INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (11, 80, '边几', '砂岩边几', '/assets/models/side-table.glb', 'rented', '苏晚', '2026-11-09');
-INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (12, 75, '休闲椅', '亚麻双人椅', '/assets/models/loveseat.glb', 'rented', '陈知遥', '2026-11-04');
-INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (13, 4, '蓝牙耳机', '回声 Air 蓝牙耳机', '/assets/models/wireless-earbuds.glb', 'rented', '陈知遥', '2026-11-13');
-INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (14, 4, '蓝牙耳机', '回声 Air 蓝牙耳机', '/assets/models/wireless-earbuds.glb', 'rented', '陈知遥', '2026-11-16');
+INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (11, 80, '边几', '砂岩边几', '/assets/models/side-table.glb', 'rented', '苏晚', '2026-11-10');
+INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (12, 75, '休闲椅', '亚麻双人椅', '/assets/models/loveseat.glb', 'rented', '陈知遥', '2026-11-05');
+INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (13, 4, '蓝牙耳机', '回声 Air 蓝牙耳机', '/assets/models/wireless-earbuds.glb', 'rented', '陈知遥', '2026-11-14');
+INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (14, 4, '蓝牙耳机', '回声 Air 蓝牙耳机', '/assets/models/wireless-earbuds.glb', 'rented', '陈知遥', '2026-11-17');
 INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (15, 10, '有线耳机', '回声 Wire 有线耳机', '/assets/models/wired-earbuds.glb', 'in_stock', NULL, NULL);
-INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (16, 9, '头戴游戏耳机', '回声 Game 游戏耳机', '/assets/models/gaming-headphones.glb', 'rented', '苏晚', '2026-11-14');
-INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (17, 8, '头戴降噪耳机', '回声 Quiet 降噪耳机', '/assets/models/anc-headphones.glb', 'rented', '林予安', '2026-11-10');
+INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (16, 9, '头戴游戏耳机', '回声 Game 游戏耳机', '/assets/models/gaming-headphones.glb', 'rented', '苏晚', '2026-11-15');
+INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (17, 8, '头戴降噪耳机', '回声 Quiet 降噪耳机', '/assets/models/anc-headphones.glb', 'rented', '林予安', '2026-11-11');
 INSERT OR IGNORE INTO products (id, category_id, category, name, model_url, status, current_borrower, current_lend_date) VALUES (18, 8, '头戴降噪耳机', '回声 Studio 降噪耳机', '/assets/models/anc-headphones.glb', 'in_stock', NULL, NULL);
-INSERT OR IGNORE INTO borrowers (id, name, note, created_at) VALUES (1, '周叙', '', '2026-11-18 23:28:06');
-INSERT OR IGNORE INTO borrowers (id, name, note, created_at) VALUES (2, '林予安', '', '2026-11-18 23:28:06');
-INSERT OR IGNORE INTO borrowers (id, name, note, created_at) VALUES (3, '沈叙白', '', '2026-11-18 23:28:06');
-INSERT OR IGNORE INTO borrowers (id, name, note, created_at) VALUES (4, '苏晚', '', '2026-11-18 23:28:06');
-INSERT OR IGNORE INTO borrowers (id, name, note, created_at) VALUES (5, '陈知遥', '', '2026-11-18 23:28:06');
-INSERT OR IGNORE INTO borrowers (id, name, note, created_at) VALUES (6, '顾清和', '', '2026-11-18 23:28:06');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (1, 1, '云栖休闲椅', '休闲椅', '陈知遥', '2026-11-11', NULL, 'rented');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (2, 4, '暖白台灯', '台灯', '林予安', '2026-10-31', NULL, 'rented');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (3, 6, '胡桃木音箱', '音响', '周叙', '2026-11-15', NULL, 'rented');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (4, 7, '黑胶唱机', '唱机', '林予安', '2026-11-06', NULL, 'rented');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (5, 8, '复古数码相机', '相机', '陈知遥', '2026-10-28', NULL, 'rented');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (6, 9, '便携投影仪', '投影仪', '苏晚', '2026-10-20', NULL, 'rented');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (7, 11, '砂岩边几', '边几', '苏晚', '2026-11-09', NULL, 'rented');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (8, 12, '亚麻双人椅', '休闲椅', '陈知遥', '2026-11-04', NULL, 'rented');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (9, 13, '回声 Air 蓝牙耳机', '蓝牙耳机', '陈知遥', '2026-11-13', NULL, 'rented');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (10, 14, '回声 Air 蓝牙耳机', '蓝牙耳机', '陈知遥', '2026-11-16', NULL, 'rented');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (11, 16, '回声 Game 游戏耳机', '头戴游戏耳机', '苏晚', '2026-11-14', NULL, 'rented');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (12, 17, '回声 Quiet 降噪耳机', '头戴降噪耳机', '林予安', '2026-11-10', NULL, 'rented');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (13, 1, '云栖休闲椅', '休闲椅', '沈叙白', '2026-08-06', '2026-08-23', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (14, 2, '榉木餐椅', '餐椅', '顾清和', '2026-08-11', '2026-08-28', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (15, 3, '苔原矮凳', '坐凳', '苏晚', '2026-08-15', '2026-08-22', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (16, 4, '暖白台灯', '台灯', '陈知遥', '2026-08-20', '2026-09-09', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (17, 5, '弧光落地灯', '落地灯', '林予安', '2026-08-24', '2026-09-13', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (18, 6, '胡桃木音箱', '音响', '周叙', '2026-08-27', '2026-09-15', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (19, 7, '黑胶唱机', '唱机', '顾清和', '2026-08-31', '2026-09-18', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (20, 8, '复古数码相机', '相机', '沈叙白', '2026-09-03', '2026-09-20', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (21, 9, '便携投影仪', '投影仪', '苏晚', '2026-09-06', '2026-09-24', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (22, 10, '低矮茶几', '茶几', '陈知遥', '2026-09-10', '2026-09-27', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (23, 11, '砂岩边几', '边几', '林予安', '2026-09-13', '2026-10-01', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (24, 12, '亚麻双人椅', '休闲椅', '周叙', '2026-09-16', '2026-10-04', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (25, 1, '云栖休闲椅', '休闲椅', '顾清和', '2026-09-21', '2026-10-09', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (26, 2, '榉木餐椅', '餐椅', '沈叙白', '2026-09-24', '2026-10-11', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (27, 3, '苔原矮凳', '坐凳', '陈知遥', '2026-09-28', '2026-10-16', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (28, 4, '暖白台灯', '台灯', '林予安', '2026-10-01', '2026-10-18', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (29, 5, '弧光落地灯', '落地灯', '周叙', '2026-10-05', '2026-10-21', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (30, 6, '胡桃木音箱', '音响', '苏晚', '2026-10-08', '2026-10-24', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (31, 7, '黑胶唱机', '唱机', '沈叙白', '2026-10-12', '2026-10-28', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (32, 8, '复古数码相机', '相机', '顾清和', '2026-10-15', '2026-10-30', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (33, 9, '便携投影仪', '投影仪', '林予安', '2026-10-19', '2026-11-03', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (34, 10, '低矮茶几', '茶几', '周叙', '2026-10-22', '2026-11-06', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (35, 11, '砂岩边几', '边几', '陈知遥', '2026-10-26', '2026-11-09', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (36, 12, '亚麻双人椅', '休闲椅', '苏晚', '2026-10-30', '2026-11-12', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (37, 2, '榉木餐椅', '餐椅', '顾清和', '2026-11-04', '2026-11-14', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (38, 5, '弧光落地灯', '落地灯', '沈叙白', '2026-11-10', '2026-11-16', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (39, 14, '回声 Air 蓝牙耳机', '蓝牙耳机', '沈叙白', '2026-11-06', '2026-11-15', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (40, 16, '回声 Game 游戏耳机', '头戴游戏耳机', '顾清和', '2026-10-26', '2026-11-07', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (41, 17, '回声 Quiet 降噪耳机', '头戴降噪耳机', '周叙', '2026-10-16', '2026-10-29', 'returned');
-INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (42, 15, '回声 Wire 有线耳机', '有线耳机', '陈知遥', '2026-10-08', '2026-10-19', 'returned');
+INSERT OR IGNORE INTO borrowers (id, name, note, created_at) VALUES (1, '周叙', '', '2026-11-19 12:57:41');
+INSERT OR IGNORE INTO borrowers (id, name, note, created_at) VALUES (2, '林予安', '', '2026-11-19 12:57:41');
+INSERT OR IGNORE INTO borrowers (id, name, note, created_at) VALUES (3, '沈叙白', '', '2026-11-19 12:57:41');
+INSERT OR IGNORE INTO borrowers (id, name, note, created_at) VALUES (4, '苏晚', '', '2026-11-19 12:57:41');
+INSERT OR IGNORE INTO borrowers (id, name, note, created_at) VALUES (5, '陈知遥', '', '2026-11-19 12:57:41');
+INSERT OR IGNORE INTO borrowers (id, name, note, created_at) VALUES (6, '顾清和', '', '2026-11-19 12:57:41');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (1, 1, '云栖休闲椅', '休闲椅', '陈知遥', '2026-11-12', NULL, 'rented');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (2, 4, '暖白台灯', '台灯', '林予安', '2026-11-01', NULL, 'rented');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (3, 6, '胡桃木音箱', '音响', '周叙', '2026-11-16', NULL, 'rented');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (4, 7, '黑胶唱机', '唱机', '林予安', '2026-11-07', NULL, 'rented');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (5, 8, '复古数码相机', '相机', '陈知遥', '2026-10-29', NULL, 'rented');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (6, 9, '便携投影仪', '投影仪', '苏晚', '2026-10-21', NULL, 'rented');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (7, 11, '砂岩边几', '边几', '苏晚', '2026-11-10', NULL, 'rented');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (8, 12, '亚麻双人椅', '休闲椅', '陈知遥', '2026-11-05', NULL, 'rented');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (9, 13, '回声 Air 蓝牙耳机', '蓝牙耳机', '陈知遥', '2026-11-14', NULL, 'rented');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (10, 14, '回声 Air 蓝牙耳机', '蓝牙耳机', '陈知遥', '2026-11-17', NULL, 'rented');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (11, 16, '回声 Game 游戏耳机', '头戴游戏耳机', '苏晚', '2026-11-15', NULL, 'rented');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (12, 17, '回声 Quiet 降噪耳机', '头戴降噪耳机', '林予安', '2026-11-11', NULL, 'rented');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (13, 1, '云栖休闲椅', '休闲椅', '沈叙白', '2026-08-07', '2026-08-24', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (14, 2, '榉木餐椅', '餐椅', '顾清和', '2026-08-12', '2026-08-29', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (15, 3, '苔原矮凳', '坐凳', '苏晚', '2026-08-16', '2026-08-23', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (16, 4, '暖白台灯', '台灯', '陈知遥', '2026-08-21', '2026-09-10', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (17, 5, '弧光落地灯', '落地灯', '林予安', '2026-08-25', '2026-09-14', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (18, 6, '胡桃木音箱', '音响', '周叙', '2026-08-28', '2026-09-16', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (19, 7, '黑胶唱机', '唱机', '顾清和', '2026-09-01', '2026-09-19', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (20, 8, '复古数码相机', '相机', '沈叙白', '2026-09-04', '2026-09-21', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (21, 9, '便携投影仪', '投影仪', '苏晚', '2026-09-07', '2026-09-25', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (22, 10, '低矮茶几', '茶几', '陈知遥', '2026-09-11', '2026-09-28', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (23, 11, '砂岩边几', '边几', '林予安', '2026-09-14', '2026-10-02', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (24, 12, '亚麻双人椅', '休闲椅', '周叙', '2026-09-17', '2026-10-05', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (25, 1, '云栖休闲椅', '休闲椅', '顾清和', '2026-09-22', '2026-10-10', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (26, 2, '榉木餐椅', '餐椅', '沈叙白', '2026-09-25', '2026-10-12', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (27, 3, '苔原矮凳', '坐凳', '陈知遥', '2026-09-29', '2026-10-17', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (28, 4, '暖白台灯', '台灯', '林予安', '2026-10-02', '2026-10-19', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (29, 5, '弧光落地灯', '落地灯', '周叙', '2026-10-06', '2026-10-22', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (30, 6, '胡桃木音箱', '音响', '苏晚', '2026-10-09', '2026-10-25', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (31, 7, '黑胶唱机', '唱机', '沈叙白', '2026-10-13', '2026-10-29', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (32, 8, '复古数码相机', '相机', '顾清和', '2026-10-16', '2026-10-31', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (33, 9, '便携投影仪', '投影仪', '林予安', '2026-10-20', '2026-11-04', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (34, 10, '低矮茶几', '茶几', '周叙', '2026-10-23', '2026-11-07', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (35, 11, '砂岩边几', '边几', '陈知遥', '2026-10-27', '2026-11-10', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (36, 12, '亚麻双人椅', '休闲椅', '苏晚', '2026-10-31', '2026-11-13', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (37, 2, '榉木餐椅', '餐椅', '顾清和', '2026-11-05', '2026-11-15', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (38, 5, '弧光落地灯', '落地灯', '沈叙白', '2026-11-11', '2026-11-17', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (39, 14, '回声 Air 蓝牙耳机', '蓝牙耳机', '沈叙白', '2026-11-07', '2026-11-16', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (40, 16, '回声 Game 游戏耳机', '头戴游戏耳机', '顾清和', '2026-10-27', '2026-11-08', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (41, 17, '回声 Quiet 降噪耳机', '头戴降噪耳机', '周叙', '2026-10-17', '2026-10-30', 'returned');
+INSERT OR IGNORE INTO rental_history (id, product_id, product_name, category, borrower, lend_date, return_date, status) VALUES (42, 15, '回声 Wire 有线耳机', '有线耳机', '陈知遥', '2026-10-09', '2026-10-20', 'returned');
 `;
