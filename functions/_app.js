@@ -40,10 +40,12 @@ import {
   parseIsoDate,
   parseInteger,
   renameCategory,
+  renameProduct,
   restoreBuiltinModel,
   returnRental,
   returnRentalsBatch,
   touchLastLogin,
+  updateBorrower,
   updateProductModels,
   updateSettings,
   updateUser,
@@ -398,6 +400,9 @@ async function handleWrite(request, env, method, path, searchParams, payload) {
   }
 
   match = path.match(/^\/api\/borrowers\/(\d+)$/);
+  if (match && method === "PATCH") {
+    return json(200, await updateBorrower(db, Number(match[1]), payload));
+  }
   if (match && method === "DELETE") {
     return json(200, await deleteBorrower(db, Number(match[1])));
   }
@@ -422,6 +427,9 @@ async function handleWrite(request, env, method, path, searchParams, payload) {
   }
 
   match = path.match(/^\/api\/products\/(\d+)$/);
+  if (match && method === "PATCH") {
+    return json(200, await renameProduct(db, Number(match[1]), payload));
+  }
   if (match && method === "DELETE") {
     return json(200, await deleteProduct(db, Number(match[1])));
   }

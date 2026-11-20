@@ -36,6 +36,15 @@
     </nav>
 
     <div class="header-side">
+      <button class="skin-trigger" id="skin-open" type="button" aria-haspopup="dialog" aria-controls="skin-dialog">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M10 3.2a6.8 6.8 0 1 0 0 13.6h1.3a1.7 1.7 0 0 0 0-3.4h-.7a1.2 1.2 0 0 1 0-2.4h3a3.2 3.2 0 0 0 3.2-3.2A4.7 4.7 0 0 0 12.1 3H10Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+          <circle cx="7.2" cy="7" r=".85" fill="currentColor"/>
+          <circle cx="10.2" cy="5.6" r=".85" fill="currentColor"/>
+          <circle cx="13.2" cy="7" r=".85" fill="currentColor"/>
+        </svg>
+        <span>皮肤</span>
+      </button>
       <button class="admin-trigger admin-only" id="admin-open-header" type="button" aria-haspopup="dialog" aria-controls="admin-drawer">
         <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
           <path d="M4 6h12M4 10h12M4 14h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
@@ -112,7 +121,16 @@
 
             <div class="viewer-info">
               <p class="eyebrow" id="product-category">座椅 · 休闲椅</p>
-              <h1 id="product-name">云栖休闲椅</h1>
+              <div class="product-name-row">
+                <h1 id="product-name">云栖休闲椅</h1>
+                <button class="product-rename-open" id="product-rename-open" type="button"
+                        aria-label="修改产品名称" title="修改产品名称" hidden>
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="m10.8 2.7 2.5 2.5M3 13l.7-3.1 7-7a1.2 1.2 0 0 1 1.7 0l1.5 1.5a1.2 1.2 0 0 1 0 1.7l-7 7L3 13Z" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>改名</span>
+                </button>
+              </div>
               <p class="product-subline" id="product-subline">低重心 · 白蜡木与亚麻</p>
               <div class="viewer-actions">
                 <button class="btn btn-primary" id="primary-action" type="button">借出产品</button>
@@ -400,6 +418,31 @@
     </form>
   </dialog>
 
+  <!-- 修改产品名称：管理员修正他人录入时的笔误 -->
+  <dialog class="modal-dialog" id="product-rename-dialog" aria-labelledby="product-rename-title">
+    <form class="modal-card" id="product-rename-form" novalidate>
+      <button class="modal-close" type="button" data-close aria-label="关闭">
+        <svg viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="m3.5 3.5 11 11m0-11-11 11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </button>
+      <span class="section-label">RENAME PRODUCT</span>
+      <h2 id="product-rename-title">修改产品名称</h2>
+      <p class="modal-product" id="product-rename-hint">—</p>
+
+      <div class="modal-field">
+        <label for="product-rename-name">产品名称</label>
+        <input id="product-rename-name" type="text" maxlength="80" placeholder="填写正确的产品名称" required autocomplete="off">
+        <small class="field-error" id="product-rename-error" aria-live="polite"></small>
+      </div>
+
+      <p class="form-note">只修改当前产品的名称，不会改变品类、3D 模型、借用状态和历史流水。</p>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" data-close>取消</button>
+        <button class="btn btn-primary" id="product-rename-submit" type="submit">保存名称</button>
+      </div>
+    </form>
+  </dialog>
+
   <!-- 添加借用人 -->
   <dialog class="modal-dialog" id="borrower-dialog" aria-labelledby="borrower-dialog-title">
     <form class="modal-card" id="borrower-form" novalidate>
@@ -408,7 +451,7 @@
       </button>
       <span class="section-label">BORROWER DIRECTORY</span>
       <h2 id="borrower-dialog-title">添加借用人</h2>
-      <p class="modal-product">先把人登记进名录，借出时可以更快选择。</p>
+      <p class="modal-product" id="borrower-dialog-hint">先把人登记进名录，借出时可以更快选择。</p>
 
       <div class="modal-form-grid">
         <div class="modal-field">
@@ -417,12 +460,13 @@
           <small class="field-error" id="borrower-name-error" aria-live="polite"></small>
         </div>
         <div class="modal-field">
-          <label for="borrower-note">备注（可选）</label>
-          <input id="borrower-note" type="text" maxlength="120" placeholder="部门 / 用途，可留空" autocomplete="off">
+          <label for="borrower-note">部门 / 备注（可选）</label>
+          <input id="borrower-note" type="text" maxlength="120" placeholder="如：文案、摄影、研发" autocomplete="off">
+          <small class="field-error" id="borrower-note-error" aria-live="polite"></small>
         </div>
       </div>
 
-      <p class="form-note">删除借用人不会删除历史流水；有器物在借时需先归还。</p>
+      <p class="form-note" id="borrower-form-note">删除借用人不会删除历史流水；有器物在借时需先归还。</p>
 
       <div class="modal-actions">
         <button class="btn btn-ghost" type="button" data-close>取消</button>

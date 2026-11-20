@@ -1,4 +1,5 @@
 import { ProductViewer, parseModelUrl } from "./viewer3d.js";
+import { initSkin } from "./skin.js";
 
 const $ = (selector, scope = document) => scope.querySelector(selector);
 const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
@@ -24,6 +25,13 @@ const els = {
   productStatus: $("#product-status"),
   productCategory: $("#product-category"),
   productName: $("#product-name"),
+  productRenameOpen: $("#product-rename-open"),
+  productRenameDialog: $("#product-rename-dialog"),
+  productRenameForm: $("#product-rename-form"),
+  productRenameHint: $("#product-rename-hint"),
+  productRenameName: $("#product-rename-name"),
+  productRenameError: $("#product-rename-error"),
+  productRenameSubmit: $("#product-rename-submit"),
   productSubline: $("#product-subline"),
   watermark: $("#viewer-watermark"),
   primaryAction: $("#primary-action"),
@@ -76,9 +84,13 @@ const els = {
   borrowerAdd: $("#borrower-add"),
   borrowerDialog: $("#borrower-dialog"),
   borrowerForm: $("#borrower-form"),
+  borrowerDialogTitle: $("#borrower-dialog-title"),
+  borrowerDialogHint: $("#borrower-dialog-hint"),
+  borrowerFormNote: $("#borrower-form-note"),
   borrowerName: $("#borrower-name"),
   borrowerNameError: $("#borrower-name-error"),
   borrowerNote: $("#borrower-note"),
+  borrowerNoteError: $("#borrower-note-error"),
   borrowerSubmit: $("#borrower-submit"),
   historyAdd: $("#history-add"),
   historyDialog: $("#history-dialog"),
@@ -556,6 +568,8 @@ const state = {
   toastTimer: null,
   searchTimer: null,
   dialogProductId: null,
+  renameProductId: null,
+  editingBorrowerId: null,
   borrowAlternatives: [],
   adminNoteData: "",
   noteProductId: null,
@@ -1332,6 +1346,7 @@ function updateViewerInfo() {
     els.secondaryAction.hidden = true;
     els.borrowSameAction.hidden = true;
     els.modelOpen.hidden = true;
+    els.productRenameOpen.hidden = true;
     state.borrowAlternatives = [];
     state.viewer?.clearProduct();
     return;
@@ -1355,6 +1370,7 @@ function updateViewerInfo() {
   els.watermark.textContent = String(allIndex + 1).padStart(2, "0");
   els.productCategory.textContent = product.category_path;
   els.productName.textContent = product.name;
+  els.productRenameOpen.hidden = !isAdmin();
   els.productStatus.classList.toggle("is-rented", rented);
   els.productStatus.querySelector("span").textContent = rented ? "出租中" : "在库";
 
@@ -1430,6 +1446,67 @@ async function removeProduct(productId) {
   }
 }
 
+function openProductRenameDialog() {
+  if (!isAdmin()) return;
+  const product = getSelectedProduct();
+  if (!product) return;
+  state.renameProductId = product.id;
+  els.productRenameForm.reset();
+  els.productRenameError.textContent = "";
+  els.productRenameName.classList.remove("is-invalid");
+  els.productRenameName.value = product.name;
+  els.productRenameHint.textContent = `${product.asset_code} · ${product.category_path}`;
+  els.productRenameSubmit.textContent = "保存名称";
+  els.productRenameDialog.showModal();
+  document.body.classList.add("modal-open");
+  window.setTimeout(() => {
+    if (!els.productRenameDialog.open) return;
+    els.productRenameName.focus();
+    els.productRenameName.select();
+  }, 40);
+}
+
+async function submitProductRename(event) {
+  event.preventDefault();
+  if (!isAdmin()) return;
+  const productId = state.renameProductId;
+  const product = state.products.find((item) => item.id === productId);
+  if (!product) return;
+  const name = els.productRenameName.value.trim();
+  if (!name) {
+    els.productRenameError.textContent = "请填写产品名称";
+    els.productRenameName.classList.add("is-invalid");
+    els.productRenameName.focus();
+    return;
+  }
+  if (name === product.name) {
+    closeDialog(els.productRenameDialog);
+    state.renameProductId = null;
+    showToast("产品名称没有变化");
+    return;
+  }
+  els.productRenameSubmit.disabled = true;
+  els.productRenameSubmit.textContent = "保存中…";
+  try {
+    await api(`/api/products/${productId}`, {
+      method: "PATCH",
+      body: { name },
+    });
+    closeDialog(els.productRenameDialog);
+    state.renameProductId = null;
+    await refreshAllData({ preserveSelection: true });
+    if (state.adminOpen) renderAdmin();
+    showToast(`已将「${product.name}」改为「${name}」`);
+  } catch (error) {
+    els.productRenameError.textContent = error.message;
+    els.productRenameName.classList.add("is-invalid");
+    els.productRenameName.focus();
+  } finally {
+    els.productRenameSubmit.disabled = false;
+    els.productRenameSubmit.textContent = "保存名称";
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Borrowers
 // ---------------------------------------------------------------------------
@@ -1459,9 +1536,17 @@ function renderBorrowers() {
       </div>
     `).join("");
     const active = borrower.total_count > 0;
+    const admin = isAdmin();
     const historyLine = borrower.history_count
       ? `历史借用 ${borrower.history_count} 次${borrower.last_lend_date ? ` · 最近 ${formatDate(borrower.last_lend_date)}` : ""}`
       : "尚无借用记录";
+    const note = borrower.note
+      ? (admin
+        ? `<div class="borrower-note-row"><button class="borrower-note" type="button" data-borrower-edit="${borrower.id}" aria-label="编辑 ${escapeHtml(borrower.borrower)} 的部门 / 备注：${escapeHtml(borrower.note)}" title="点击修改部门 / 备注">${escapeHtml(borrower.note)}</button></div>`
+        : `<div class="borrower-note-row"><span class="borrower-note">${escapeHtml(borrower.note)}</span></div>`)
+      : (admin
+        ? `<button class="borrower-note borrower-note--empty" type="button" data-borrower-edit="${borrower.id}" aria-label="补充 ${escapeHtml(borrower.borrower)} 的部门" title="补充部门">＋ 补充部门</button>`
+        : `<span class="borrower-note borrower-note--empty">部门未填写</span>`);
     return `
       <article class="borrower-card" style="--i:${index}" data-borrower="${escapeHtml(borrower.borrower)}"
                data-borrower-id="${borrower.id}" tabindex="0">
@@ -1471,14 +1556,21 @@ function renderBorrowers() {
             <h2 class="borrower-name">${escapeHtml(borrower.borrower)}</h2>
             <p class="borrower-count">${active ? `当前借用 ${borrower.total_count} 件` : "当前无借用"}</p>
           </div>
-          ${isAdmin() ? `<button class="borrower-delete" type="button" data-borrower-delete="${borrower.id}"
-                  aria-label="删除借用人 ${escapeHtml(borrower.borrower)}"
-                  title="${active ? `还有 ${borrower.total_count} 件在借，归还后可删除` : "删除借用人"}"
-                  ${active ? "disabled" : ""}>
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 4.5h9M6 4.5V3h4v1.5M5 4.5l.4 8h5.2l.4-8M7 7v3.2M9 7v3.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>` : ""}
+          ${admin ? `<div class="borrower-card-actions">
+            <button class="borrower-edit" type="button" data-borrower-edit="${borrower.id}"
+                    aria-label="编辑借用人 ${escapeHtml(borrower.borrower)}"
+                    title="编辑部门 / 备注">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m10.8 2.7 2.5 2.5M3 13l.7-3.1 7-7a1.2 1.2 0 0 1 1.7 0l1.5 1.5a1.2 1.2 0 0 1 0 1.7l-7 7L3 13Z" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="borrower-delete" type="button" data-borrower-delete="${borrower.id}"
+                    aria-label="删除借用人 ${escapeHtml(borrower.borrower)}"
+                    title="${active ? `还有 ${borrower.total_count} 件在借，归还后可删除` : "删除借用人"}"
+                    ${active ? "disabled" : ""}>
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 4.5h9M6 4.5V3h4v1.5M5 4.5l.4 8h5.2l.4-8M7 7v3.2M9 7v3.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>` : ""}
         </div>
-        ${borrower.note ? `<p class="borrower-note">${escapeHtml(borrower.note)}</p>` : ""}
+        ${note}
         ${items ? `<div class="borrower-items">${items}</div>` : `<p class="borrower-idle">所有器物均已归还</p>`}
         <div class="borrower-history">${historyLine}</div>
       </article>
@@ -1505,40 +1597,76 @@ function highlightBorrower(name) {
   window.setTimeout(() => card.classList.remove("is-highlighted"), 2200);
 }
 
-function openBorrowerDialog() {
+function openBorrowerDialog(borrower = null) {
+  const editing = Boolean(borrower);
+  if (editing && !isAdmin()) return;
+  state.editingBorrowerId = editing ? borrower.id : null;
   els.borrowerForm.reset();
   els.borrowerNameError.textContent = "";
-  els.borrowerName.classList.remove("is-invalid");
+  els.borrowerNoteError.textContent = "";
+  els.borrowerName.classList.remove("is-invalid", "is-readonly");
+  els.borrowerNote.classList.remove("is-invalid");
+  els.borrowerName.readOnly = editing;
+  els.borrowerName.classList.toggle("is-readonly", editing);
+  els.borrowerName.value = editing ? borrower.borrower : "";
+  els.borrowerNote.value = editing ? borrower.note || "" : "";
+  els.borrowerDialogTitle.textContent = editing ? "编辑借用人" : "添加借用人";
+  els.borrowerDialogHint.textContent = editing
+    ? `补上「${borrower.borrower}」的部门或备注，姓名不会改变。`
+    : "先把人登记进名录，借出时可以更快选择。";
+  els.borrowerFormNote.textContent = editing
+    ? "只修改部门 / 备注，不会影响姓名、在借器物和历史流水。"
+    : "删除借用人不会删除历史流水；有器物在借时需先归还。";
+  els.borrowerSubmit.textContent = editing ? "保存修改" : "添加";
   els.borrowerDialog.showModal();
   document.body.classList.add("modal-open");
   window.setTimeout(() => {
-    if (els.borrowerDialog.open) els.borrowerName.focus();
+    if (!els.borrowerDialog.open) return;
+    (editing ? els.borrowerNote : els.borrowerName).focus();
   }, 40);
 }
 
 async function submitBorrower(event) {
   event.preventDefault();
+  const editingId = state.editingBorrowerId;
+  if (editingId && !isAdmin()) return;
   const name = els.borrowerName.value.trim();
-  if (!name) {
+  if (!editingId && !name) {
     els.borrowerNameError.textContent = "请填写借用人姓名";
     els.borrowerName.classList.add("is-invalid");
     els.borrowerName.focus();
     return;
   }
+  const note = els.borrowerNote.value.trim();
   els.borrowerSubmit.disabled = true;
   const original = els.borrowerSubmit.textContent;
-  els.borrowerSubmit.textContent = "添加中…";
+  els.borrowerSubmit.textContent = editingId ? "保存中…" : "添加中…";
   try {
-    await api("/api/borrowers", {
-      method: "POST",
-      body: { name, note: els.borrowerNote.value.trim() },
-    });
+    if (editingId) {
+      await api(`/api/borrowers/${editingId}`, {
+        method: "PATCH",
+        body: { note },
+      });
+    } else {
+      await api("/api/borrowers", {
+        method: "POST",
+        body: { name, note },
+      });
+    }
     closeDialog(els.borrowerDialog);
+    state.editingBorrowerId = null;
     await refreshAllData({ preserveSelection: true });
-    showToast(`已添加借用人「${name}」`);
+    showToast(editingId ? `已更新借用人「${name}」` : `已添加借用人「${name}」`);
   } catch (error) {
-    els.borrowerNameError.textContent = error.message;
-    els.borrowerName.classList.add("is-invalid");
+    if (editingId) {
+      els.borrowerNoteError.textContent = error.message;
+      els.borrowerNote.classList.add("is-invalid");
+      els.borrowerNote.focus();
+    } else {
+      els.borrowerNameError.textContent = error.message;
+      els.borrowerName.classList.add("is-invalid");
+      els.borrowerName.focus();
+    }
   } finally {
     els.borrowerSubmit.disabled = false;
     els.borrowerSubmit.textContent = original;
@@ -3429,6 +3557,9 @@ function bindEvents() {
     window.setTimeout(() => highlightBorrower(product.current_borrower), 80);
   });
 
+  els.productRenameOpen.addEventListener("click", openProductRenameDialog);
+  els.productRenameForm.addEventListener("submit", submitProductRename);
+
   els.borrowerRefresh.addEventListener("click", async () => {
     els.borrowerRefresh.classList.add("is-spinning");
     try {
@@ -3442,9 +3573,17 @@ function bindEvents() {
     }
   });
 
-  els.borrowerAdd.addEventListener("click", openBorrowerDialog);
+  els.borrowerAdd.addEventListener("click", () => openBorrowerDialog());
   els.borrowerForm.addEventListener("submit", submitBorrower);
   els.borrowerGrid.addEventListener("click", (event) => {
+    const editButton = event.target.closest("[data-borrower-edit]");
+    if (editButton) {
+      const borrower = state.borrowers.find(
+        (item) => item.id === Number(editButton.dataset.borrowerEdit)
+      );
+      if (borrower) openBorrowerDialog(borrower);
+      return;
+    }
     const button = event.target.closest("[data-borrower-delete]");
     if (!button || button.disabled) return;
     removeBorrower(Number(button.dataset.borrowerDelete));
@@ -3777,6 +3916,7 @@ function initAdminModelSelect() {
 async function init() {
   setHeaderDate();
   bindEvents();
+  initSkin();
   initAdminModelSelect();
   updateAdminNoteCount();
   state.showEmptyCategories = readShowEmptyPreference();

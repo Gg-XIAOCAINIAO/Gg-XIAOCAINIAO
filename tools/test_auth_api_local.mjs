@@ -138,6 +138,18 @@ async function main() {
     });
     ok(memberModel.status === 403, "member cannot change model", memberModel);
 
+    const memberProductRename = await dispatch("PATCH", `/api/products/${memberProductId}`, {
+      cookie: workerCookie2,
+      body: { name: "成员改名" },
+    });
+    ok(memberProductRename.status === 403, "member cannot rename product", memberProductRename);
+
+    const memberBorrowerEdit = await dispatch("PATCH", "/api/borrowers/1", {
+      cookie: workerCookie2,
+      body: { note: "成员改部门" },
+    });
+    ok(memberBorrowerEdit.status === 403, "member cannot edit borrower department", memberBorrowerEdit);
+
     const memberDelete = await dispatch("DELETE", `/api/products/${memberProductId}`, { cookie: workerCookie2 });
     ok(memberDelete.status === 200, "member can delete in-stock product", memberDelete);
 

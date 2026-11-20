@@ -31,6 +31,7 @@ SCHEMA_PATH = BASE_DIR / "db" / "schema.sql"
 DEFAULT_DB_PATH = BASE_DIR / "data" / "rentals.db"
 DB_PATH = DEFAULT_DB_PATH
 SEED_LOCK = Lock()
+DEFAULT_NOTE_PLACEHOLDER = "给器物留个便签吧——可以备注一下用来干啥（办公或自用），最好拍张产品照片上传哦～"
 MAX_MODEL_BYTES = 15 * 1024 * 1024
 MAX_PAYLOAD_BYTES = 22 * 1024 * 1024
 mimetypes.add_type("model/gltf-binary", ".glb")
@@ -893,6 +894,48 @@ def create_borrower(conn: sqlite3.Connection, payload: dict) -> dict:
     }
 
 
+def get_setting(conn: sqlite3.Connection, key: str, default: str = "") -> str:
+    row = conn.execute("SELECT value FROM app_settings WHERE key = ?", (key,)).fetchone()
+    return row["value"] if row is not None else default
+
+
+def get_note_placeholder(conn: sqlite3.Connection) -> str:
+    return get_setting(conn, "note_placeholder", DEFAULT_NOTE_PLACEHOLDER)
+
+
+def update_settings(conn: sqlite3.Connection, payload: dict) -> dict:
+    if "note_placeholder" not in payload:
+        raise ApiError(400, "没有需要保存的设置")
+    value = clean_text(payload.get("note_placeholder"), "备注提示语", 160)
+    conn.execute(
+        """
+        INSERT INTO app_settings (key, value, updated_at)
+        VALUES ('note_placeholder', ?, datetime('now', 'localtime'))
+        ON CONFLICT(key) DO UPDATE SET
+            value = excluded.value,
+            updated_at = excluded.updated_at
+        """,
+        (value,),
+    )
+    conn.commit()
+    return {"note_placeholder": value}
+
+
+def update_borrower(conn: sqlite3.Connection, borrower_id: int, payload: dict) -> dict:
+    borrower = get_borrower(conn, borrower_id)
+    if borrower is None:
+        raise ApiError(404, "借用人不存在")
+    if "note" not in payload:
+        raise ApiError(400, "请提供要修改的部门或备注")
+    note_raw = payload.get("note")
+    note = " ".join(str(note_raw).split()) if note_raw else ""
+    if len(note) > 120:
+        raise ApiError(400, "备注不能超过 120 个字符")
+    conn.execute("UPDATE borrowers SET note = ? WHERE id = ?", (note, borrower_id))
+    conn.commit()
+    return {"id": borrower_id, "borrower": borrower["name"], "note": note}
+
+
 def delete_borrower(conn: sqlite3.Connection, borrower_id: int) -> dict:
     borrower = get_borrower(conn, borrower_id)
     if borrower is None:
@@ -1071,6 +1114,18 @@ def create_products(conn: sqlite3.Connection, payload: dict) -> list[dict]:
         conn.rollback()
         raise
     return [to_product(get_product(conn, product_id)) for product_id in created_ids]
+
+
+def rename_product(conn: sqlite3.Connection, product_id: int, payload: dict) -> dict:
+    product = get_product(conn, product_id)
+    if product is None:
+        raise ApiError(404, "产品不存在")
+    name = clean_text(payload.get("name"), "产品名称", 80)
+    if name == product["name"]:
+        return {"id": product_id, "name": name, "previous_name": product["name"], "unchanged": True}
+    conn.execute("UPDATE products SET name = ? WHERE id = ?", (name, product_id))
+    conn.commit()
+    return {"id": product_id, "name": name, "previous_name": product["name"], "unchanged": False}
 
 
 def delete_product(conn: sqlite3.Connection, product_id: int) -> dict:
@@ -1584,6 +1639,11 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(200, list_categories(conn))
             return
 
+        if path == "/api/settings":
+            with closing(connect()) as conn:
+                self.send_json(200, {"note_placeholder": get_note_placeholder(conn)})
+            return
+
         if path == "/api/borrowers":
             with closing(connect()) as conn:
                 self.send_json(200, list_borrowers(conn))
@@ -1638,6 +1698,11 @@ class Handler(BaseHTTPRequestHandler):
                 return
 
             match = re.fullmatch(r"/api/borrowers/(\d+)", path)
+            if match and method == "PATCH":
+                with closing(connect()) as conn:
+                    self.send_json(200, update_borrower(conn, int(match.group(1)), payload))
+                return
+
             if match and method == "DELETE":
                 with closing(connect()) as conn:
                     self.send_json(200, delete_borrower(conn, int(match.group(1))))
@@ -1675,6 +1740,11 @@ class Handler(BaseHTTPRequestHandler):
                     self.send_json(200, restore_builtin_model(conn, payload.get("key")))
                 return
 
+            if method == "PATCH" and path == "/api/settings":
+                with closing(connect()) as conn:
+                    self.send_json(200, update_settings(conn, payload))
+                return
+
             match = re.fullmatch(r"/api/categories/(\d+)", path)
             if match and method == "PATCH":
                 with closing(connect()) as conn:
@@ -1696,6 +1766,11 @@ class Handler(BaseHTTPRequestHandler):
                 return
 
             match = re.fullmatch(r"/api/products/(\d+)", path)
+            if match and method == "PATCH":
+                with closing(connect()) as conn:
+                    self.send_json(200, rename_product(conn, int(match.group(1)), payload))
+                return
+
             if match and method == "DELETE":
                 with closing(connect()) as conn:
                     self.send_json(200, delete_product(conn, int(match.group(1))))

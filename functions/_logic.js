@@ -722,6 +722,23 @@ export async function createBorrower(db, payload) {
   };
 }
 
+export async function updateBorrower(db, borrowerId, payload) {
+  const borrower = await getBorrower(db, borrowerId);
+  if (!borrower) throw new ApiError(404, "借用人不存在");
+  if (!payload || !Object.prototype.hasOwnProperty.call(payload, "note")) {
+    throw new ApiError(400, "请提供要修改的部门或备注");
+  }
+  const noteRaw = payload.note === undefined || payload.note === null ? "" : payload.note;
+  const note = noteRaw ? normalizeSpaces(noteRaw) : "";
+  if ([...note].length > 120) throw new ApiError(400, "备注不能超过 120 个字符");
+  await run(db, "UPDATE borrowers SET note = ? WHERE id = ?", note, borrowerId);
+  return {
+    id: borrowerId,
+    borrower: borrower.name,
+    note,
+  };
+}
+
 export async function deleteBorrower(db, borrowerId) {
   const borrower = await getBorrower(db, borrowerId);
   if (!borrower) throw new ApiError(404, "借用人不存在");
@@ -883,6 +900,17 @@ export async function deleteCategory(db, categoryId, cascade = false) {
     await deleteNoteImageIfUnused(db, imageId);
   }
   return { ok: true, deleted_products: deletedProducts };
+}
+
+export async function renameProduct(db, productId, payload) {
+  const product = await getProduct(db, productId);
+  if (!product) throw new ApiError(404, "产品不存在");
+  const name = cleanText(payload?.name, "产品名称", 80);
+  if (name === product.name) {
+    return { id: productId, name, previous_name: product.name, unchanged: true };
+  }
+  await run(db, "UPDATE products SET name = ? WHERE id = ?", name, productId);
+  return { id: productId, name, previous_name: product.name, unchanged: false };
 }
 
 export async function deleteProduct(db, productId) {
